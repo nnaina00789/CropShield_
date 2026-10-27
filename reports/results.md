@@ -36,3 +36,13 @@
 - Potato Late blight → Tomato Late blight: same pathogen (Phytophthora infestans) on related plants; disease correct, crop wrong.
 - Most dangerous error: Tomato Late blight → Tomato healthy (a diseased plant called healthy).
 - Data quality issues found: one "Soybean healthy" image is almost entirely background with barely any leaf; one "Cherry healthy" image shows a field of grass, not a single leaf (likely mislabelled). Two of the four cross-crop errors come from faulty images, not model failure.
+
+## Grad-CAM explanations (ResNet18, layer4)
+- Method: Grad-CAM on ResNet18's last conv block (512 maps, 7×7), upsampled to 224×224 and overlaid on the image. Implemented from scratch with forward/tensor hooks.
+- Correct predictions (diseased leaves): attention falls on lesions and discoloured patches → the model uses disease features, not the background.
+- Correct predictions (healthy leaves): attention falls on leaf edges/outline → shape is used to identify the crop; no lesion to focus on.
+- Mistakes fall into three types:
+  1. Right place, wrong answer — Corn Cercospora → Northern Leaf Blight: attention on a real lesion; the two diseases look alike.
+  2. Bad data — "Cherry healthy" image of grass → Strawberry leaf scorch: attention scattered, no single leaf to focus on.
+  3. Possible mislabel — Tomato Late blight → healthy (100% confident): leaf shows no visible lesions.
+- Limitation: the heatmap starts at 7×7 resolution, so it shows the region the model used, not exact lesion outlines.
