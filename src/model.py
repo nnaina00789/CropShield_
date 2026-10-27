@@ -1,5 +1,6 @@
 import torch
 import torch.nn as nn
+from torchvision import models
 
 def block(c_in, c_out):
     return nn.Sequential(
@@ -23,14 +24,13 @@ class SimpleCNN(nn.Module):
         x = self.pool(x).flatten(1)
         return self.classifier(x)
 
+def build_resnet18(num_classes=38):
+    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)  # pretrained on ImageNet
+    model.fc = nn.Linear(model.fc.in_features, num_classes)                 # new last layer: 512 -> 38
+    return model
+
 if __name__ == "__main__":
-    model = SimpleCNN()
-    x = torch.randn(32, 3, 224, 224)  # fake batch, same shape as our real ones
-    print("input:        ", tuple(x.shape))
-    for i, blk in enumerate(model.features, 1):
-        x = blk(x)
-        print(f"after block {i}:", tuple(x.shape))
-    x = model.pool(x).flatten(1)
-    print("after pooling:", tuple(x.shape))
-    print("output:       ", tuple(model.classifier(x).shape))
-    print(f"parameters: {sum(p.numel() for p in model.parameters()):,}")
+    for name, model in [("SimpleCNN", SimpleCNN()), ("ResNet18", build_resnet18())]:
+        out = model(torch.randn(2, 3, 224, 224))
+        params = sum(p.numel() for p in model.parameters())
+        print(f"{name:10s} output {tuple(out.shape)}  parameters {params:,}")
