@@ -1,0 +1,18 @@
+path,label,predicted,confidence
+Tomato___Early_blight/aca65de6-6464-4f8c-803d-b55f92f950f8___RS_Erly.B 6663.JPG,Tomato___Early_blight,Tomato___Septoria_leaf_spot,0.965
+Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot/a47710cd-fdee-4562-8e91-1d7f405ca44f___RS_GLSp 4409.JPG,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Northern_Leaf_Blight,0.975
+Tomato___Spider_mites Two-spotted_spider_mite/2bc44ebe-0c50-4e13-b174-c7af34098ed9___Com.G_SpM_FL 9399.JPG,Tomato___Spider_mites Two-spotted_spider_mite,Tomato___Target_Spot,0.549
+Tomato___Target_Spot/17cc92e0-8ca2-4917-8a55-1c4eb0e66182___Com.G_TgS_FL 9857.JPG,Tomato___Target_Spot,Tomato___Spider_mites Two-spotted_spider_mite,0.552
+Tomato___Spider_mites Two-spotted_spider_mite/d9d22025-cee6-4963-ac70-bfa8a7af30a2___Com.G_SpM_FL 1624.JPG,Tomato___Spider_mites Two-spotted_spider_mite,Tomato___Target_Spot,0.515
+Apple___healthy/c89af5ca-be92-4d72-af08-56598771c4c3___RS_HL 5695.JPG,Apple___healthy,Soybean___healthy,0.762
+Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot/b53702bb-dfd5-4791-a550-d691cdb8a822___RS_GLSp 4379.JPG,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Northern_Leaf_Blight,0.593
+Tomato___Late_blight/d674cbf6-0cdc-407a-97ea-c3f53f2c51e4___GH_HL Leaf 170.JPG,Tomato___Late_blight,Tomato___healthy,1.0
+Soybean___healthy/b32e4516-9cd7-4226-be52-26f413c97834___RS_HL 3512.JPG,Soybean___healthy,Corn_(maize)___healthy,0.644
+Tomato___Target_Spot/96028d51-a29b-4251-a0de-4615a6dc6d26___Com.G_TgS_FL 9730.JPG,Tomato___Target_Spot,Tomato___Spider_mites Two-spotted_spider_mite,0.526
+Tomato___Target_Spot/b76a19d9-8059-4b55-9a0f-e5f8f2cfb3cb___Com.G_TgS_FL 9964.JPG,Tomato___Target_Spot,Tomato___Spider_mites Two-spotted_spider_mite,0.655
+Tomato___Target_Spot/d10a8e5b-bf53-45de-adbe-ea42f9bcb937___Com.G_TgS_FL 9910.JPG,Tomato___Target_Spot,Tomato___Early_blight,0.883
+Tomato___Late_blight/aa358a07-3140-4f44-861b-dcd99f943b09___RS_Late.B 5542.JPG,Tomato___Late_blight,Tomato___Early_blight,0.697
+Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot/6f69678a-a16a-417a-931b-49a22e810ed8___RS_GLSp 4679.JPG,Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot,Corn_(maize)___Northern_Leaf_Blight,0.504
+Potato___Late_blight/72b12e17-d76f-4254-a4af-3ed3c3859500___RS_LB 3334.JPG,Potato___Late_blight,Tomato___Late_blight,0.589
+Cherry_(including_sour)___healthy/4b1fcb7b-3fa6-4bd9-bad0-59328645eef6___JR_HL 4087.JPG,Cherry_(including_sour)___healthy,Strawberry___Leaf_scorch,0.975
+Tomato___Late_blight/15581dd8-f562-4301-856c-30be9302c470___GHLB2 Leaf 70.1.JPG,Tomato___Late_blight,Tomato___Bacterial_spot,0.796
