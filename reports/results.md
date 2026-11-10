@@ -53,3 +53,13 @@
 - Cause type matters for treatment: fungicides do not work on bacteria or viruses; viral diseases (TYLCV, ToMV) and Huanglongbing have no cure, so advice focuses on removal and vector control.
 - Safety: guidance names chemical types only, never doses; the app will tell users to confirm with a local agriculture officer / KVK and to follow product labels.
 - Sources: TNAU Agritech Portal, UC IPM, APS Disease Lessons.
+
+## Streamlit app (app/app.py)
+- Upload a leaf photo → prediction + confidence, Grad-CAM overlay, and treatment advice from remedies.json.
+- Reuses project code: eval_tf and CLASSES (dataset.py), build_resnet18 (model.py), GradCAM (gradcam.py); model cached with st.cache_resource.
+- Safety: 80% confidence threshold (below it the app shows "Not sure" and no advice) and a disclaimer pointing to the local agriculture officer / KVK.
+- Demo tests (images from the test set, in demo_images/):
+  - Tomato Late blight → correct, 100% confident; heatmap on the dark lesion.
+  - Apple healthy → correct, 100% confident; heatmap over the whole leaf outline.
+  - Non-leaf photo (skyscrapers) → best guess "Tomato Leaf mold" at only 34% → app correctly showed "Not sure" with no advice.
+- Limitation: the model always picks one of its 38 classes; the threshold catches many unfamiliar images but is not a guaranteed "not a leaf" detector, since models can be confidently wrong.
