@@ -46,3 +46,10 @@
   2. Bad data — "Cherry healthy" image of grass → Strawberry leaf scorch: attention scattered, no single leaf to focus on.
   3. Possible mislabel — Tomato Late blight → healthy (100% confident): leaf shows no visible lesions.
 - Limitation: the heatmap starts at 7×7 resolution, so it shows the region the model used, not exact lesion outlines.
+
+## Treatment suggestions
+- File: app/remedies.json, covering all 38 classes (verified by src/check_remedies.py).
+- Each entry: display name, cause type (fungal / bacterial / viral / pest / water mould / healthy), cause, symptoms, treatment steps, prevention steps.
+- Cause type matters for treatment: fungicides do not work on bacteria or viruses; viral diseases (TYLCV, ToMV) and Huanglongbing have no cure, so advice focuses on removal and vector control.
+- Safety: guidance names chemical types only, never doses; the app will tell users to confirm with a local agriculture officer / KVK and to follow product labels.
+- Sources: TNAU Agritech Portal, UC IPM, APS Disease Lessons.
