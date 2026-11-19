@@ -26,13 +26,13 @@ class GradCAM:
         cam = F.relu((weights * self.maps).sum(1, keepdim=True))     # 2-3. weighted sum, keep positive
         cam = F.interpolate(cam, size=x.shape[2:], mode="bilinear", align_corners=False)[0, 0]  # 4. 7x7 -> 224x224
         cam = (cam - cam.min()) / (cam.max() - cam.min() + 1e-8)     # scale to 0..1 for colouring
-        return cam.detach().cpu().numpy(), idx, probs[idx].item()
+        return cam.detach().cpu().numpy(), idx, probs[idx].item(), probs.detach().cpu().numpy()
 
 def explain(gradcam, rows, out_file):
     fig, axes = plt.subplots(len(rows), 2, figsize=(7, 3.4 * len(rows)))
     for ax_row, r in zip(axes, rows.itertuples()):
         img = Image.open(ROOT / r.path).convert("RGB")
-        heat, idx, conf = gradcam(eval_tf(img).unsqueeze(0).to("cuda"))
+        heat, idx, conf, _ = gradcam(eval_tf(img).unsqueeze(0).to("cuda"))
         small = img.resize((224, 224))
         ax_row[0].imshow(small)
         ax_row[0].set_title(f"TRUE: {r.label.replace('___', ' - ')}", fontsize=9)
