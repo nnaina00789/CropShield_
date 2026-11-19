@@ -4,9 +4,11 @@ import io
 from datetime import datetime
 from pathlib import Path
 import numpy as np
+import pandas as pd
 import torch
 import streamlit as st
 import matplotlib.cm as cm
+import pydeck as pdk
 from PIL import Image
 
 sys.path.append(str(Path(__file__).resolve().parent.parent / "src"))
@@ -192,6 +194,50 @@ UI = {
     }
 }
 
+# Agro-climatic regions database for India
+AGRO_REGIONS = {
+    "🍎 Himalayan Temperate Zone (North)": {
+        "states": "Himachal Pradesh, Jammu & Kashmir, Uttarakhand",
+        "lat": 32.0, "lon": 76.5,
+        "crops": ["Apple", "Peach", "Cherry"],
+        "soil": "Brown hill soil, acidic mountain soil",
+        "irrigation": "Natural mountain springs, rainfed contours",
+        "climate": "Chilling winters, temperate summers (15°C–28°C)",
+        "threats": "Apple Scab (Venturia), Cedar Apple Rust, Powdery Mildew",
+        "why": "Spring snow-melt creates high ambient humidity, triggering fungal spore release."
+    },
+    "🌽 Indo-Gangetic Plains (North & Central)": {
+        "states": "Uttar Pradesh, Punjab, Haryana, Bihar, Madhya Pradesh",
+        "lat": 26.8, "lon": 80.9,
+        "crops": ["Potato", "Corn_(maize)", "Soybean", "Tomato"],
+        "soil": "Alluvial deep fertile loam (Khadar and Bhangar)",
+        "irrigation": "Extensive canal networks, tube-wells",
+        "climate": "Extreme summers (40°C+), cold humid winters (5°C–18°C)",
+        "threats": "Late Blight (Phytophthora) in potato/tomato, Corn Leaf Blight, Early Blight",
+        "why": "Heavy winter morning dew and dense fog create perfect incubation for Phytophthora water mould."
+    },
+    "🍇 Deccan Plateau & Western Semiarid Belt": {
+        "states": "Maharashtra, Karnataka, Telangana, Gujarat",
+        "lat": 19.5, "lon": 74.5,
+        "crops": ["Grape", "Pepper,_bell", "Tomato", "Squash"],
+        "soil": "Black cotton soil (Regur), volcanic basaltic loam",
+        "irrigation": "Precision drip systems, farm ponds (Tals)",
+        "climate": "Semi-arid, tropical wet-and-dry (20°C–36°C)",
+        "threats": "Grape Black Rot, Esca (Black Measles), Bell Pepper Bacterial Spot",
+        "why": "Sudden unseasonal post-monsoon showers cause rapid berry cracking and fungal entry."
+    },
+    "🍊 Subtropical & Coastal Horticulture Belts": {
+        "states": "Punjab/Rajasthan (Citrus), Andhra Pradesh, Tamil Nadu, Mahabaleshwar",
+        "lat": 15.5, "lon": 78.5,
+        "crops": ["Orange", "Strawberry", "Blueberry", "Raspberry"],
+        "soil": "Red sandy loam, laterite, enriched peat for berries",
+        "irrigation": "Micro-sprinklers, raised beds with silver-black mulch",
+        "climate": "Subtropical, frost-free winters, high sunshine hours",
+        "threats": "Citrus Greening (Huanglongbing), Strawberry Leaf Scorch, Spider Mites",
+        "why": "Sap-sucking psyllid insects and warm dry air accelerate vector-borne viral/bacterial spread."
+    }
+}
+
 @st.cache_resource
 def load_assets():
     detector = load_leaf_detector(device=DEVICE)
@@ -246,84 +292,100 @@ st.markdown(f"""
 
 
 # ==========================================
-# PAGE 0: INTRO - INDIAN FARMING & CROPS
+# PAGE 0: INTRO - INTERACTIVE INDIAN FARMING EXPLORER
 # ==========================================
 if page == t["nav_overview"]:
-    st.subheader("🌾 Crop Cultivation Across Diverse Agro-Climatic Zones of India")
+    st.subheader("🗺️ Interactive Agro-Climatic Explorer: Crops & Farming Systems of India")
     st.write(
-        "India is the world's second-largest agricultural producer. Diverse topographies, rainfall patterns, "
-        "and soil types allow for distinct horticultural and staple crop belts across different states. "
-        "Below is how the **14 key crops supported by CropShield** are cultivated across India's premier farming zones:"
+        "India is characterized by distinct agricultural micro-climates. Explore how the **14 key crops supported by CropShield** "
+        "are grown, irrigated, and protected across India's premier farming belts:"
     )
 
-    r1, r2 = st.columns(2)
-    with r1:
-        st.markdown("""
-        <div class="region-card">
-            <div class="region-title">🍎 1. Himalayan Temperate Zone (North & Northwest)</div>
-            <b>Key States:</b> Himachal Pradesh, Jammu & Kashmir, Uttarakhand<br/>
-            <b>Crops Covered in CropShield:</b> <b>Apple, Peach, Cherry</b><br/>
-            <b>Farming Practice & Climate:</b> High-altitude terraced farming, cold winters, moderate rainfall, well-drained loamy soil. Requires careful chilling-hour management.<br/>
-            <b>Major Vulnerabilities:</b> Fungal leaf scabs, powdery mildews, and rusts triggered by humid snow-melt springs and monsoons.
+    # 1. Interactive Region Selector
+    selected_reg_name = st.selectbox(
+        "📍 Select an Agricultural Belt to Inspect:",
+        list(AGRO_REGIONS.keys()),
+        index=1
+    )
+    reg_data = AGRO_REGIONS[selected_reg_name]
+
+    # 2. Interactive Map & Deep-Dive Info Card Side by Side
+    col_map, col_details = st.columns([1.1, 1.3], gap="medium")
+
+    with col_map:
+        # PyDeck Interactive Map pinpointing Indian Agricultural Zones
+        map_df = pd.DataFrame([
+            {"name": k, "lat": v["lat"], "lon": v["lon"], "color": [46, 125, 50, 200] if k == selected_reg_name else [150, 150, 150, 140], "radius": 90000 if k == selected_reg_name else 50000}
+            for k, v in AGRO_REGIONS.items()
+        ])
+
+        view_state = pdk.ViewState(
+            latitude=22.5,
+            longitude=78.5,
+            zoom=3.8,
+            pitch=35
+        )
+
+        layer = pdk.Layer(
+            "ScatterplotLayer",
+            data=map_df,
+            get_position="[lon, lat]",
+            get_color="color",
+            get_radius="radius",
+            pickable=True,
+            auto_highlight=True,
+        )
+
+        st.pydeck_chart(
+            pdk.Deck(
+                layers=[layer],
+                initial_view_state=view_state,
+                tooltip={"text": "{name}"},
+                map_style=None
+            )
+        )
+        st.caption("🟢 Green pin highlights the currently inspected agricultural zone.")
+
+    with col_details:
+        st.markdown(f"""
+        <div class="cs-card">
+            <h3 style="margin-top:0; color:#2e7d32;">{selected_reg_name}</h3>
+            <p><b>📍 Primary States:</b> {reg_data['states']}</p>
+            <p><b>🌱 Supported Crops in Zone:</b> <b>{', '.join([c.replace('_', ' ') for c in reg_data['crops']])}</b></p>
+            <p><b>🌍 Soil Type:</b> {reg_data['soil']}</p>
+            <p><b>💧 Irrigation System:</b> {reg_data['irrigation']}</p>
+            <p><b>☀️ Climate Dynamics:</b> {reg_data['climate']}</p>
+            <div style="background: rgba(46, 125, 50, 0.08); padding: 12px; border-radius: 8px; border-left: 4px solid #2e7d32; margin-top: 10px;">
+                <b>⚠️ High-Risk Disease Vulnerabilities:</b><br/>
+                {reg_data['threats']}<br/><br/>
+                <b>🔬 Biological Trigger:</b> {reg_data['why']}
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
-        st.markdown("""
-        <div class="region-card">
-            <div class="region-title">🌽 2. Indo-Gangetic Plains & Central India</div>
-            <b>Key States:</b> Uttar Pradesh, Punjab, Bihar, Madhya Pradesh, Haryana<br/>
-            <b>Crops Covered in CropShield:</b> <b>Potato, Corn (Maize), Soybean, Tomato</b><br/>
-            <b>Farming Practice & Climate:</b> Intensive alluvial flat-land farming, canal and tubewell irrigation. Multi-cropping seasons (Kharif, Rabi, and Zaid).<br/>
-            <b>Major Vulnerabilities:</b> Early and Late Blights in winter potatoes/tomatoes during fog and overcast dew periods; leaf blights and rusts in maize.
-        </div>
-        """, unsafe_allow_html=True)
-
-    with r2:
-        st.markdown("""
-        <div class="region-card">
-            <div class="region-title">🍇 3. Deccan Plateau & Western Semiarid Belt</div>
-            <b>Key States:</b> Maharashtra, Karnataka, Telangana, Gujarat<br/>
-            <b>Crops Covered in CropShield:</b> <b>Grape, Bell Pepper (Capsicum), Tomato, Squash</b><br/>
-            <b>Farming Practice & Climate:</b> Black cotton soil (Regur) and red loam. High adoption of drip irrigation, polyhouses for capsicum, and trellised commercial vineyards in Nashik and Sangli.<br/>
-            <b>Major Vulnerabilities:</b> Grape black rot, downy/powdery mildew during post-monsoon cane maturity, and bacterial spots in peppers.
-        </div>
-        """, unsafe_allow_html=True)
-
-        st.markdown("""
-        <div class="region-card">
-            <div class="region-title">🍊 4. Subtropical & Coastal Horticulture Belts</div>
-            <b>Key States:</b> Punjab/Rajasthan (Citrus), Andhra Pradesh, Tamil Nadu, Mahabaleshwar (Maharashtra)<br/>
-            <b>Crops Covered in CropShield:</b> <b>Orange (Citrus), Strawberry, Blueberry, Raspberry</b><br/>
-            <b>Farming Practice & Climate:</b> Specialized microclimates — frost-free citrus belts, hill-station strawberry bed cultivation with plastic mulching, and open-field subtropical orchards.<br/>
-            <b>Major Vulnerabilities:</b> Citrus Huanglongbing (Greening) spread by psyllid vectors, strawberry leaf scorch, and soil-borne fungal pathogens.
-        </div>
-        """, unsafe_allow_html=True)
+    # 3. Live Leaf Preview Carousel for Crops in Selected Zone
+    st.markdown(f"#### 🌿 Live Leaf Library for {selected_reg_name.split('(')[0]}")
+    crop_cols = st.columns(len(reg_data["crops"]))
+    for i, c_name in enumerate(reg_data["crops"]):
+        with crop_cols[i]:
+            healthy_img = get_healthy_reference_image(c_name)
+            if healthy_img:
+                st.image(healthy_img.resize((180, 180)), caption=f"{c_name.replace('_', ' ')} (Certified Leaf)", use_container_width=True)
+            else:
+                st.caption(f"{c_name.replace('_', ' ')}")
 
     st.markdown("---")
-    st.markdown("### 🎯 Why Early AI Disease Diagnosis Matters for Indian Farmers")
-    
-    col_feat1, col_feat2, col_feat3 = st.columns(3)
-    with col_feat1:
+
+    # 4. Immediate CTA Banner to Diagnosis
+    cta_col1, cta_col2 = st.columns([2.5, 1])
+    with cta_col1:
         st.markdown("""
-        <div class="step-box">
-            <div class="step-num">🚨 Yield Protection</div>
-            <div class="step-text">Late blight in potatoes and tomatoes can destroy an entire field within <b>7 to 10 days</b> of visible onset if untreated.</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col_feat2:
-        st.markdown("""
-        <div class="step-box">
-            <div class="step-num">💰 Reduced Chemical Cost</div>
-            <div class="step-text">Over-spraying broad-spectrum fungicides drains farmer income. CropShield specifies exact pathogen classes (fungal, bacterial, viral).</div>
-        </div>
-        """, unsafe_allow_html=True)
-    with col_feat3:
-        st.markdown("""
-        <div class="step-box">
-            <div class="step-num">📱 Instant Accessibility</div>
-            <div class="step-text">Bypasses long turnaround times for physical lab visits by delivering instant verified diagnosis directly on the smartphone.</div>
-        </div>
-        """, unsafe_allow_html=True)
+        ### Ready to analyze a leaf from your field?
+        Switch directly to the **Leaf Diagnosis** engine to screen for 38 conditions with Grad-CAM heatmaps and export a PDF advisory.
+        """)
+    with cta_col2:
+        st.markdown("<br/>", unsafe_allow_html=True)
+        st.info("👉 Use the **Sidebar Menu** to open **🩺 Leaf Diagnosis**")
 
 
 # ==========================================
