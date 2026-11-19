@@ -1042,11 +1042,12 @@ elif page == t["nav_crops"]:
     st.markdown(f"#### 🛡️ Pathological Conditions Screened for {inspect_crop.replace('_', ' ')}")
     st.caption("Standardized uniform visual samples, biological classification, foliar symptoms, and cultural actions for each condition:")
     
-    # Collect standard classes for this crop
-    crop_classes = [c for c in CLASSES if c.startswith(inspect_crop + "___")]
+    # Collect standard classes for this crop (handling Cherry's benchmark naming)
+    prefix = "Cherry_(including_sour)___" if inspect_crop == "Cherry" else f"{inspect_crop}___"
+    crop_classes = [c for c in CLASSES if c.startswith(prefix)]
     
     # Also collect any extended condition for this crop (Orange, Squash, Soybean, Blueberry, Raspberry)
-    ext_classes = [k for k in EXTENDED_PATHOLOGY if k.startswith(inspect_crop + "___") and k not in crop_classes]
+    ext_classes = [k for k in EXTENDED_PATHOLOGY if k.startswith(f"{inspect_crop}___") and k not in crop_classes]
     all_display_classes = crop_classes + ext_classes
 
     cols = st.columns(len(all_display_classes) if len(all_display_classes) <= 3 else 3)
@@ -1058,8 +1059,10 @@ elif page == t["nav_crops"]:
             else:
                 info = remedies[c]
                 sample_img_path = Path("demo_images") / f"{c}.jpg"
-                if not sample_img_path.exists() and c.startswith("Cherry"):
-                    sample_img_path = Path("demo_images") / "Cherry_(including_sour)___healthy.jpg"
+                if not sample_img_path.exists() and "Cherry" in c:
+                    sample_img_path = Path("demo_images") / f"{c}.jpg"
+                    if not sample_img_path.exists():
+                        sample_img_path = Path("demo_images") / "Cherry_(including_sour)___healthy.jpg"
             
             # Standardized exact 240x240 image
             fitted_img = get_standardized_image(sample_img_path, (240, 240))
