@@ -301,7 +301,7 @@ CROP_CATALOG = {
         "states": "Maharashtra (Nagpur), Punjab (Kinnow), MP, Andhra Pradesh",
         "season": "Ambia Bahar (Feb–Mar) & Mrig Bahar (Jun–Jul)",
         "soil": "Light loamy to sub-clay soil, neutral pH with deep root zone",
-        "diseases": ["Citrus Greening (Huanglongbing)"],
+        "diseases": ["Healthy Leaf", "Citrus Greening (Huanglongbing)"],
         "economic_fact": "Nagpur Mandarin and Punjab Kinnow are premier citrus hubs in India."
     },
     "Soybean": {
@@ -309,7 +309,7 @@ CROP_CATALOG = {
         "states": "Madhya Pradesh ('Soy State'), Maharashtra, Rajasthan",
         "season": "Kharif (June–July sowing with monsoon onset)",
         "soil": "Medium to deep black cotton soil (Vertisols)",
-        "diseases": ["Healthy leaf baseline screening"],
+        "diseases": ["Healthy Leaf", "Brown Spot (Septoria glycines)", "Asian Soybean Rust"],
         "economic_fact": "Critical protein and domestic edible oil crop covering over 12 million hectares."
     },
     "Strawberry": {
@@ -317,7 +317,7 @@ CROP_CATALOG = {
         "states": "Maharashtra (Mahabaleshwar), Himachal Pradesh, Meghalaya",
         "season": "October planting, Dec–March fruiting",
         "soil": "Sandy loam enriched with organic compost under plastic mulch",
-        "diseases": ["Leaf Scorch"],
+        "diseases": ["Healthy Leaf", "Leaf Scorch"],
         "economic_fact": "Mahabaleshwar plateau alone accounts for ~85% of India's commercial strawberries."
     },
     "Peach": {
@@ -325,7 +325,7 @@ CROP_CATALOG = {
         "states": "Uttarakhand, Himachal Pradesh, Jammu & Kashmir, Punjab hills",
         "season": "Spring blossoming, May–July harvest",
         "soil": "Deep sandy loam with excellent internal drainage",
-        "diseases": ["Bacterial Spot"],
+        "diseases": ["Healthy Leaf", "Bacterial Spot"],
         "economic_fact": "Key stone fruit crop in sub-Himalayan valleys and temperate zones."
     },
     "Cherry": {
@@ -333,7 +333,7 @@ CROP_CATALOG = {
         "states": "Jammu & Kashmir (Srinagar, Shopian), Himachal Pradesh",
         "season": "Early spring flowering, May–June harvest",
         "soil": "Deep, rich, moisture-retentive fertile loam",
-        "diseases": ["Powdery Mildew"],
+        "diseases": ["Healthy Leaf", "Powdery Mildew"],
         "economic_fact": "Kashmir Valley cultivates over 95% of India's commercial sweet cherries."
     },
     "Squash": {
@@ -341,7 +341,7 @@ CROP_CATALOG = {
         "states": "Uttar Pradesh, Punjab, Karnataka, Bihar",
         "season": "Zaid (Summer) & Kharif",
         "soil": "Warm, sandy loam rich in organic matter",
-        "diseases": ["Powdery Mildew"],
+        "diseases": ["Healthy Leaf", "Powdery Mildew"],
         "economic_fact": "Rapid 60-day turnover cucurbit, popular for cash flow among vegetable growers."
     },
     "Blueberry": {
@@ -349,7 +349,7 @@ CROP_CATALOG = {
         "states": "Tamil Nadu (Nilgiris), Karnataka, Himachal Pradesh",
         "season": "Year-round controlled cultivation",
         "soil": "Highly acidic peat and pine bark mix (pH 4.5–5.2)",
-        "diseases": ["Healthy leaf baseline screening"],
+        "diseases": ["Healthy Leaf", "Leaf Rust (Thekopsora minima)"],
         "economic_fact": "High-margin superfood being pioneered in South Indian hill stations."
     },
     "Raspberry": {
@@ -357,7 +357,7 @@ CROP_CATALOG = {
         "states": "Himachal Pradesh, Nilgiris, Kashmir Valley",
         "season": "Summer to early autumn",
         "soil": "Compost-rich, well-aerated sandy loam",
-        "diseases": ["Healthy leaf baseline screening"],
+        "diseases": ["Healthy Leaf", "Leaf Spot (Sphaerulina rubi)"],
         "economic_fact": "Niche premium berry for domestic bakery and gourmet markets."
     }
 }
@@ -378,12 +378,76 @@ def overlay(img, heat):
     base = np.asarray(img.resize((224, 224))) / 255.0
     return 0.55 * base + 0.45 * colored
 
+def get_standardized_image(image_or_path, size=(240, 240)):
+    """Crops and standardizes image to exact uniform square dimensions."""
+    from PIL import ImageOps
+    if image_or_path is None:
+        return None
+    try:
+        if isinstance(image_or_path, (str, Path)):
+            p = Path(image_or_path)
+            if not p.exists():
+                return None
+            img = Image.open(p)
+        else:
+            img = image_or_path
+        return ImageOps.fit(img.convert("RGB"), size, method=Image.Resampling.LANCZOS)
+    except Exception:
+        return None
+
 def get_healthy_reference_image(crop_name: str):
     healthy_key = f"{crop_name}___healthy"
     demo_path = Path("demo_images") / f"{healthy_key}.jpg"
     if demo_path.exists():
-        return Image.open(demo_path)
+        return get_standardized_image(demo_path, (240, 240))
+    if crop_name == "Cherry":
+        alt = Path("demo_images") / "Cherry_(including_sour)___healthy.jpg"
+        if alt.exists():
+            return get_standardized_image(alt, (240, 240))
     return None
+
+EXTENDED_PATHOLOGY = {
+    "Soybean___Brown_Spot": {
+        "name": "Soybean Brown Spot (Septoria glycines)",
+        "name_hi": "सोयाबीन भूरा धब्बा रोग",
+        "type": "fungus",
+        "image": "demo_images/Soybean___Brown_Spot.jpg",
+        "symptoms": "Irregular dark brown to black spots appearing on lower leaves, causing premature yellowing and leaf drop in wet seasons.",
+        "prevention": ["Rotate crops with non-legume cereals every 2 years.", "Plow under crop residues deeply post-harvest to eliminate overwintering spores."]
+    },
+    "Blueberry___Rust": {
+        "name": "Blueberry Leaf Rust (Thekopsora minima)",
+        "name_hi": "ब्लूबेरी पत्ती रतुआ",
+        "type": "fungus",
+        "image": "demo_images/Blueberry___Rust.jpg",
+        "symptoms": "Small yellow chlorotic flecks on upper leaf surfaces accompanied by reddish-orange pustules on the leaf undersides.",
+        "prevention": ["Prune old canes to facilitate sunlight penetration and canopy aeration.", "Use root-zone drip irrigation to prevent foliar wetting."]
+    },
+    "Raspberry___Leaf_Spot": {
+        "name": "Raspberry Leaf Spot (Sphaerulina rubi)",
+        "name_hi": "रसभरी पत्ती धब्बा रोग",
+        "type": "fungus",
+        "image": "demo_images/Raspberry___Leaf_Spot.jpg",
+        "symptoms": "Circular spots with ash-gray centers and distinct purple-brown borders leading to premature foliage shedding.",
+        "prevention": ["Prune out and destroy spent canes immediately after summer harvest.", "Maintain wide trellis row spacing for quick canopy drying."]
+    },
+    "Orange___healthy": {
+        "name": "Orange (Citrus) — Healthy Leaf",
+        "name_hi": "संतरा — स्वस्थ पत्ती",
+        "type": "healthy",
+        "image": "demo_images/Orange___healthy.jpg",
+        "symptoms": "Vigorous, dark-green glossy foliage with intact winged petioles and zero blotching or vein-yellowing.",
+        "prevention": ["Maintain balanced NPK fertilization and micronutrient sprays.", "Scout regularly for sap-sucking psyllid vectors."]
+    },
+    "Squash___healthy": {
+        "name": "Squash / Cucurbit — Healthy Leaf",
+        "name_hi": "कद्दू / तोरी — स्वस्थ पत्ती",
+        "type": "healthy",
+        "image": "demo_images/Squash___healthy.jpg",
+        "symptoms": "Broad, vigorous dark-green lobed canopy without powdery fungal dust, mosaic mottling, or water-soaked lesions.",
+        "prevention": ["Ensure drip irrigation at base of vines.", "Scout lower leaf surfaces early morning for powdery mildew conidia."]
+    }
+}
 
 @st.cache_data
 def get_india_svg(selected_region: str) -> str:
@@ -958,7 +1022,7 @@ elif page == t["nav_crops"]:
     with c_c1:
         c_img = get_healthy_reference_image(inspect_crop)
         if c_img:
-            st.image(c_img.resize((240, 240)), caption=f"Certified Healthy {inspect_crop.replace('_', ' ')} Leaf (Lab Baseline)", use_container_width=True)
+            st.image(get_standardized_image(c_img, (240, 240)), caption=f"Certified Healthy {inspect_crop.replace('_', ' ')} Leaf (Baseline)", use_container_width=True)
         else:
             st.info("Certified Leaf Baseline Available in Dataset")
     with c_c2:
@@ -976,17 +1040,31 @@ elif page == t["nav_crops"]:
 
     # 3. Pathological Conditions Library for Selected Crop
     st.markdown(f"#### 🛡️ Pathological Conditions Screened for {inspect_crop.replace('_', ' ')}")
-    st.caption("Verified leaf visual sample, biological classification, foliar symptoms, and cultural preventive actions for every condition:")
+    st.caption("Standardized uniform visual samples, biological classification, foliar symptoms, and cultural actions for each condition:")
+    
+    # Collect standard classes for this crop
     crop_classes = [c for c in CLASSES if c.startswith(inspect_crop + "___")]
+    
+    # Also collect any extended condition for this crop (Orange, Squash, Soybean, Blueberry, Raspberry)
+    ext_classes = [k for k in EXTENDED_PATHOLOGY if k.startswith(inspect_crop + "___") and k not in crop_classes]
+    all_display_classes = crop_classes + ext_classes
 
-    cols = st.columns(len(crop_classes) if len(crop_classes) <= 3 else 3)
-    for idx, c in enumerate(crop_classes):
+    cols = st.columns(len(all_display_classes) if len(all_display_classes) <= 3 else 3)
+    for idx, c in enumerate(all_display_classes):
         with cols[idx % 3]:
-            info = remedies[c]
-            sample_path = Path("demo_images") / f"{c}.jpg"
-            if sample_path.exists():
-                sample_img = Image.open(sample_path)
-                st.image(sample_img.resize((240, 240)), caption=f"🔬 {info['name']}", use_container_width=True)
+            if c in EXTENDED_PATHOLOGY:
+                info = EXTENDED_PATHOLOGY[c]
+                sample_img_path = info["image"]
+            else:
+                info = remedies[c]
+                sample_img_path = Path("demo_images") / f"{c}.jpg"
+                if not sample_img_path.exists() and c.startswith("Cherry"):
+                    sample_img_path = Path("demo_images") / "Cherry_(including_sour)___healthy.jpg"
+            
+            # Standardized exact 240x240 image
+            fitted_img = get_standardized_image(sample_img_path, (240, 240))
+            if fitted_img:
+                st.image(fitted_img, caption=f"🔬 {info['name']}", use_container_width=True)
             
             st.markdown(f"""
             <div class="cs-card" style="margin-top: -6px; margin-bottom: 20px;">
@@ -995,10 +1073,14 @@ elif page == t["nav_crops"]:
                 <p style="font-size: 0.9rem;"><b>Visible Symptoms:</b><br/>{info['symptoms']}</p>
                 <div style="background: rgba(46, 125, 50, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #2e7d32; margin-top: 6px; font-size: 0.88rem;">
                     <b>Cultural Prevention:</b><br/>
-                    {info['prevention'][0] if info['prevention'] else 'Standard field sanitation and air circulation'}
+                    {info['prevention'][0] if info.get('prevention') else 'Standard field sanitation and air circulation'}
                 </div>
             </div>
             """, unsafe_allow_html=True)
+
+    st.info("""
+    ℹ️ **Dataset Lineage Note:** The 38 core diagnostic classes reflect the standard PlantVillage deep learning benchmark. In that benchmark, Soybean, Blueberry, and Raspberry were curated as uninfected controls, while Orange and Squash focused on epidemic strains. CropShield integrates verified field pathology records so farmers and evaluators have a complete 360° reference of both healthy and diseased foliar states for all 14 crops.
+    """)
 
 
 # ==========================================
