@@ -221,5 +221,6 @@ __marimo__/
    
 # Dataset (too large for GitHub)
 data/
-checkpoints/
+checkpoints/simple_cnn.pt
+checkpoints/resnet18.pt
 deploy_space/
