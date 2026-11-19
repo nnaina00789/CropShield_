@@ -1,0 +1,47 @@
+=== Feature 4: Before vs. After Field Fine-Tuning Comparison ===
+Training data used: PlantVillage train subset (7,515 images) + PlantDoc train (2,337 images, 4x oversampled)
+PlantDoc test set (238 images) was NEVER seen during training.
+
+Metric                                 | Before (resnet18.pt)   | After (resnet18_field.pt) | Change      
+---------------------------------------------------------------------------------------------------------
+PlantDoc Test Top-1 Accuracy (field)   |               20.17% |                  61.34% |   +41.17 pp
+PlantDoc Test Top-3 Accuracy (field)   |               43.28% |                  87.39% |   +44.11 pp
+PlantDoc Test Crop-Level Accuracy      |               46.64% |                  79.41% |   +32.77 pp
+PlantVillage Test Top-1 Accuracy (lab) |               99.69% |                  98.47% |    -1.22 pp
+PlantVillage Test Mistakes (of 5,431)  |                   17 |                      83 |      +66
+
+PlantDoc Test Classification Report (After):
+                                                    precision    recall  f1-score   support
+
+                                Apple___Apple_scab      0.750     0.600     0.667        10
+                          Apple___Cedar_apple_rust      0.600     0.600     0.600        10
+                                   Apple___healthy      0.625     0.556     0.588         9
+                               Blueberry___healthy      0.615     0.727     0.667        11
+                 Cherry_(including_sour)___healthy      0.667     0.600     0.632        10
+Corn_(maize)___Cercospora_leaf_spot Gray_leaf_spot      0.167     0.250     0.200         4
+                       Corn_(maize)___Common_rust_      0.692     0.900     0.783        10
+               Corn_(maize)___Northern_Leaf_Blight      0.600     0.500     0.545        12
+                                 Grape___Black_rot      0.857     0.750     0.800         8
+                                   Grape___healthy      0.917     0.846     0.880        13
+                                   Peach___healthy      0.500     0.778     0.609         9
+                     Pepper,_bell___Bacterial_spot      0.556     0.556     0.556         9
+                            Pepper,_bell___healthy      0.636     0.778     0.700         9
+                             Potato___Early_blight      0.500     0.375     0.429         8
+                              Potato___Late_blight      0.500     0.625     0.556         8
+                               Raspberry___healthy      0.875     1.000     0.933         7
+                                 Soybean___healthy      0.583     0.875     0.700         8
+                           Squash___Powdery_mildew      0.833     0.833     0.833         6
+                              Strawberry___healthy      0.889     1.000     0.941         8
+                           Tomato___Bacterial_spot      0.125     0.111     0.118         9
+                             Tomato___Early_blight      0.455     0.556     0.500         9
+                              Tomato___Late_blight      0.556     0.500     0.526        10
+                                Tomato___Leaf_Mold      0.200     0.167     0.182         6
+                       Tomato___Septoria_leaf_spot      0.615     0.727     0.667        11
+     Tomato___Spider_mites Two-spotted_spider_mite      0.000     0.000     0.000         0
+            Tomato___Tomato_Yellow_Leaf_Curl_Virus      0.800     0.667     0.727         6
+                      Tomato___Tomato_mosaic_virus      1.000     0.100     0.182        10
+                                  Tomato___healthy      0.750     0.375     0.500         8
+
+                                          accuracy                          0.613       238
+                                         macro avg      0.602     0.584     0.572       238
+                                      weighted avg      0.638     0.613     0.602       238
