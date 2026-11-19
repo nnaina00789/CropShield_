@@ -197,6 +197,7 @@ UI = {
 # Agro-climatic regions database for India
 AGRO_REGIONS = {
     "🍎 Himalayan Temperate Zone (North)": {
+        "short_name": "🍎 Himalayan Belt",
         "states": "Himachal Pradesh, Jammu & Kashmir, Uttarakhand",
         "lat": 32.0, "lon": 76.5,
         "crops": ["Apple", "Peach", "Cherry"],
@@ -207,6 +208,7 @@ AGRO_REGIONS = {
         "why": "Spring snow-melt creates high ambient humidity, triggering fungal spore release."
     },
     "🌽 Indo-Gangetic Plains (North & Central)": {
+        "short_name": "🌽 Indo-Gangetic Plains",
         "states": "Uttar Pradesh, Punjab, Haryana, Bihar, Madhya Pradesh",
         "lat": 26.8, "lon": 80.9,
         "crops": ["Potato", "Corn_(maize)", "Soybean", "Tomato"],
@@ -217,6 +219,7 @@ AGRO_REGIONS = {
         "why": "Heavy winter morning dew and dense fog create perfect incubation for Phytophthora water mould."
     },
     "🍇 Deccan Plateau & Western Semiarid Belt": {
+        "short_name": "🍇 Deccan Plateau",
         "states": "Maharashtra, Karnataka, Telangana, Gujarat",
         "lat": 19.5, "lon": 74.5,
         "crops": ["Grape", "Pepper,_bell", "Tomato", "Squash"],
@@ -227,6 +230,7 @@ AGRO_REGIONS = {
         "why": "Sudden unseasonal post-monsoon showers cause rapid berry cracking and fungal entry."
     },
     "🍊 Subtropical & Coastal Horticulture Belts": {
+        "short_name": "🍊 Coastal Horticulture",
         "states": "Punjab/Rajasthan (Citrus), Andhra Pradesh, Tamil Nadu, Mahabaleshwar",
         "lat": 15.5, "lon": 78.5,
         "crops": ["Orange", "Strawberry", "Blueberry", "Raspberry"],
@@ -412,13 +416,13 @@ st.markdown(f"""
 
 
 # ==========================================
-# PAGE 0: INTRO - INTERACTIVE INDIAN FARMING EXPLORER
+# PAGE 0: INTRO - INDIAN FARMING EXPLORER
 # ==========================================
 if page == t["nav_overview"]:
-    st.subheader("🗺️ Interactive Agro-Climatic Explorer: Crops & Farming Systems of India")
+    st.subheader("🗺️ Agro-Climatic Regions & Crop Farming Systems of India")
     st.write(
         "India is characterized by diverse agricultural micro-climates. Explore how the **14 key crops supported by CropShield** "
-        "are cultivated, seasonal threats evolve, and simulate disease outbreaks in real time across India's premier farming belts."
+        "are cultivated, seasonal threats evolve, and simulate disease outbreaks across India's premier farming belts."
     )
 
     # 1. Real-Time Agricultural Pulse Metrics
@@ -455,8 +459,8 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # 2. Interactive Cropping Seasons Matrix (Kharif, Rabi, Zaid)
-    st.markdown("#### 🌦️ Interactive Cropping Seasons of India")
+    # 2. Cropping Seasons Matrix (Kharif, Rabi, Zaid)
+    st.markdown("#### 🌦️ Cropping Seasons of India (Kharif, Rabi, Zaid)")
     st.caption("Select a cropping season to inspect how temperature, monsoon rainfall, and pathogen risks shift throughout the year:")
 
     tab_kharif, tab_rabi, tab_zaid = st.tabs([
@@ -509,33 +513,61 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # 3. Interactive Agro-Climatic Belt 3D Map & Deep Dive
-    st.markdown("#### 🗺️ Regional Agro-Climatic Belts & Soil Systems")
-    selected_reg_name = st.selectbox(
-        "📍 Select an Agricultural Belt to Inspect:",
-        list(AGRO_REGIONS.keys()),
-        index=1
-    )
+    # 3. Regional Agro-Climatic Belts & Focused Map of India
+    st.markdown("#### 🗺️ Regional Agro-Climatic Belts of India")
+    
+    # Session state for belt selection (click map or button)
+    if "selected_region" not in st.session_state or st.session_state["selected_region"] not in AGRO_REGIONS:
+        st.session_state["selected_region"] = list(AGRO_REGIONS.keys())[1]
+
+    # Quick Selection Buttons for Farming Belts
+    st.markdown("📍 **Select Agricultural Belt (Click any button below or click directly on the India map):**")
+    b_cols = st.columns(4)
+    for i, (r_key, r_val) in enumerate(AGRO_REGIONS.items()):
+        with b_cols[i]:
+            is_active = (r_key == st.session_state["selected_region"])
+            if st.button(
+                r_val.get("short_name", r_key.split("(")[0].strip()),
+                key=f"belt_btn_{i}",
+                type="primary" if is_active else "secondary",
+                use_container_width=True
+            ):
+                st.session_state["selected_region"] = r_key
+                st.rerun()
+
+    selected_reg_name = st.session_state["selected_region"]
     reg_data = AGRO_REGIONS[selected_reg_name]
 
     col_map, col_details = st.columns([1.1, 1.3], gap="medium")
 
     with col_map:
         map_df = pd.DataFrame([
-            {"name": k, "lat": v["lat"], "lon": v["lon"], "color": [46, 125, 50, 220] if k == selected_reg_name else [150, 150, 150, 140], "radius": 95000 if k == selected_reg_name else 50000}
+            {
+                "name": k,
+                "short_name": v.get("short_name", k.split("(")[0].strip()),
+                "lat": v["lat"],
+                "lon": v["lon"],
+                "color": [46, 125, 50, 230] if k == selected_reg_name else [230, 81, 0, 210],
+                "radius": 110000 if k == selected_reg_name else 70000
+            }
             for k, v in AGRO_REGIONS.items()
         ])
 
+        # Centered strictly on India (straight 2D top-down view)
         view_state = pdk.ViewState(
-            latitude=22.5,
-            longitude=78.5,
-            zoom=3.8,
-            pitch=35
+            latitude=22.2,
+            longitude=79.2,
+            zoom=4.2,
+            min_zoom=3.8,
+            max_zoom=6.5,
+            pitch=0,
+            bearing=0
         )
 
-        layer = pdk.Layer(
+        layer_pts = pdk.Layer(
             "ScatterplotLayer",
             data=map_df,
+            id="agro-regions-points",
             get_position="[lon, lat]",
             get_color="color",
             get_radius="radius",
@@ -543,15 +575,43 @@ if page == t["nav_overview"]:
             auto_highlight=True,
         )
 
-        st.pydeck_chart(
-            pdk.Deck(
-                layers=[layer],
-                initial_view_state=view_state,
-                tooltip={"text": "{name}"},
-                map_style=None
-            )
+        layer_txt = pdk.Layer(
+            "TextLayer",
+            data=map_df,
+            id="agro-regions-labels",
+            get_position="[lon, lat]",
+            get_text="short_name",
+            get_size=13,
+            get_color="[20, 60, 25, 255]",
+            get_alignment_baseline="'bottom'",
+            get_text_anchor="'middle'",
+            pickable=False,
         )
-        st.caption("🟢 Green pin highlights the currently inspected agricultural zone.")
+
+        deck = pdk.Deck(
+            layers=[layer_pts, layer_txt],
+            initial_view_state=view_state,
+            tooltip={"html": "<b>{name}</b><br/>👉 Click to select this zone", "style": {"backgroundColor": "#2e7d32", "color": "white"}},
+            map_style="light"
+        )
+
+        map_event = st.pydeck_chart(
+            deck,
+            on_select="rerun",
+            selection_mode="single-object",
+            key="india_map_chart"
+        )
+
+        # Handle map marker click event
+        if map_event and hasattr(map_event, "selection") and map_event.selection:
+            sel_objs = map_event.selection.get("objects", {}).get("agro-regions-points", [])
+            if sel_objs and len(sel_objs) > 0:
+                clicked_zone = sel_objs[0].get("name")
+                if clicked_zone and clicked_zone in AGRO_REGIONS and clicked_zone != selected_reg_name:
+                    st.session_state["selected_region"] = clicked_zone
+                    st.rerun()
+
+        st.caption("🟢 Green marker = Active zone. 🟠 Orange markers = Click to inspect. Map centered on India.")
 
     with col_details:
         st.markdown(f"""
@@ -583,7 +643,7 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # 4. Interactive Micro-Climate Disease Outbreak Simulator (Real-Time Pathology Predictor)
+    # 4. Micro-Climate Disease Outbreak Simulator (Real-Time Pathology Predictor)
     st.markdown("#### 🔬 Real-Time Micro-Climate Outbreak Simulator")
     st.write(
         "Plant pathogens (fungal spores, bacteria, and viral vectors) require specific micro-climatic thresholds to germinate and spread. "
@@ -687,7 +747,7 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # 5. Interactive 14-Crop Deep-Dive Directory
+    # 5. 14-Crop Deep-Dive Directory
     st.markdown("#### 📚 Crop Pathology & Agronomy Library (14 Species)")
     st.write("Browse all 14 crop species supported by CropShield to view their state distribution, soil preferences, and disease profiles:")
 
