@@ -1,0 +1,86 @@
+{
+  "Uttar Pradesh": {
+    "district": "Varanasi / Lucknow / Kanpur / Meerut",
+    "kvk": "Krishi Vigyan Kendra, ICAR-IIVR, Varanasi",
+    "contact": "+91 542-2635221 / kvkvaranasi@icar.gov.in",
+    "helpline": "Kisan Call Center: 1800-180-1551 (Toll-Free, 6 AM - 10 PM)"
+  },
+  "Maharashtra": {
+    "district": "Pune / Nashik / Nagpur / Aurangabad",
+    "kvk": "Krishi Vigyan Kendra, Baramati (Pune)",
+    "contact": "+91 2112-255227 / kvkbaramati@yahoo.com",
+    "helpline": "Kisan Call Center: 1800-180-1551 (Toll-Free)"
+  },
+  "Punjab": {
+    "district": "Ludhiana / Amritsar / Bhatinda / Patiala",
+    "kvk": "Krishi Vigyan Kendra, PAU Campus, Ludhiana",
+    "contact": "+91 161-2401960 / kvkludhiana@pau.edu",
+    "helpline": "PAU Farmer Helpline: 1800-180-1551 / 0161-2401960"
+  },
+  "Haryana": {
+    "district": "Karnal / Hisar / Rohtak / Ambala",
+    "kvk": "Krishi Vigyan Kendra, NDRI / CCS HAU, Karnal",
+    "contact": "+91 184-2259000 / kvkkarnal@gmail.com",
+    "helpline": "CCS HAU Toll-Free: 1800-180-3001"
+  },
+  "Madhya Pradesh": {
+    "district": "Bhopal / Indore / Jabalpur / Ujjain",
+    "kvk": "Krishi Vigyan Kendra, CIAE Campus, Nabi Bagh, Bhopal",
+    "contact": "+91 755-2737191 / kvkbhopal@gmail.com",
+    "helpline": "Kisan Call Center: 1800-180-1551"
+  },
+  "Rajasthan": {
+    "district": "Jaipur / Jodhpur / Kota / Bikaner",
+    "kvk": "Krishi Vigyan Kendra, Durgapura, Jaipur",
+    "contact": "+91 141-2550229 / kvkdurgapura@gmail.com",
+    "helpline": "Rajasthan Kisan Seva Kendra: 1800-180-1551"
+  },
+  "Gujarat": {
+    "district": "Ahmedabad / Anand / Rajkot / Surat",
+    "kvk": "Krishi Vigyan Kendra, AAU, Anand",
+    "contact": "+91 2692-261310 / kvkanand@aau.in",
+    "helpline": "Gujarat i-Khedut Portal: 1800-180-1551"
+  },
+  "Bihar": {
+    "district": "Patna / Muzaffarpur / Bhagalpur / Gaya",
+    "kvk": "Krishi Vigyan Kendra, Barh, Patna",
+    "contact": "+91 612-2222555 / kvkpatna@gmail.com",
+    "helpline": "Bihar Agriculture Helpline: 1800-180-1551"
+  },
+  "West Bengal": {
+    "district": "Kolkata / Nadia / Burdwan / Hooghly",
+    "kvk": "Krishi Vigyan Kendra, BCKV, Mohanpur, Nadia",
+    "contact": "+91 3473-222269 / bckvkvk@gmail.com",
+    "helpline": "Kisan Call Center: 1800-180-1551"
+  },
+  "Karnataka": {
+    "district": "Bengaluru / Mysuru / Dharwad / Belagavi",
+    "kvk": "Krishi Vigyan Kendra, UAS Campus, Hebbal, Bengaluru",
+    "contact": "+91 80-23418182 / kvkhebbal@gmail.com",
+    "helpline": "Karnataka Raitha Sahayavani: 1800-425-3553"
+  },
+  "Andhra Pradesh & Telangana": {
+    "district": "Guntur / Krishna / Hyderabad / Warangal",
+    "kvk": "Krishi Vigyan Kendra, ANGRAU, Lam, Guntur",
+    "contact": "+91 863-2524017 / kvklam@gmail.com",
+    "helpline": "Rythu Bharosa Kendra / Kisan Call Center: 1800-180-1551"
+  },
+  "Tamil Nadu": {
+    "district": "Coimbatore / Madurai / Thanjavur / Trichy",
+    "kvk": "Krishi Vigyan Kendra, TNAU, Coimbatore",
+    "contact": "+91 422-6611200 / kvk@tnau.ac.in",
+    "helpline": "Uzhavan Farmer Helpline: 1800-180-1551 / 0422-6611200"
+  },
+  "Himachal Pradesh & J&K": {
+    "district": "Shimla / Kangra / Solan / Jammu",
+    "kvk": "Krishi Vigyan Kendra, YS Parmar UHF, Rohru, Shimla",
+    "contact": "+91 1781-240122 / kvkshimla@yspuniversity.ac.in",
+    "helpline": "Kisan Call Center: 1800-180-1551"
+  },
+  "All India (General)": {
+    "district": "All Districts across India",
+    "kvk": "ICAR - Indian Council of Agricultural Research & 731 KVK Network",
+    "contact": "Website: https://kvk.icar.gov.in (Find your exact block/district KVK)",
+    "helpline": "National Kisan Call Center: 1800-180-1551 (Toll-Free, 22 languages)"
+  }
+}
