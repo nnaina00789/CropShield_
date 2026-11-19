@@ -76,6 +76,24 @@ st.markdown("""
         margin-top: 6px;
     }
 
+    /* Region / Intro Card */
+    .region-card {
+        background-color: var(--secondary-background-color);
+        border-top: 4px solid #2e7d32;
+        border-radius: 10px;
+        padding: 18px;
+        margin-bottom: 16px;
+        border-left: 1px solid rgba(128, 128, 128, 0.2);
+        border-right: 1px solid rgba(128, 128, 128, 0.2);
+        border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+    }
+    .region-title {
+        font-size: 1.25rem;
+        font-weight: 700;
+        color: #2e7d32;
+        margin-bottom: 6px;
+    }
+
     /* Diagnosis Result Banner */
     .cs-result-banner {
         background-color: rgba(46, 125, 50, 0.12);
@@ -96,7 +114,8 @@ st.markdown("""
 UI = {
     "English": {
         "title": "🌿 CropShield AI",
-        "tagline": "Production-Grade Crop Disease Identification, OOD Leaf Verification & Explainable AI (Grad-CAM)",
+        "tagline": "Empowering Indian Agriculture with Computer Vision & Targeted Crop Health Diagnostics",
+        "nav_overview": "🌾 Indian Agriculture & Crops",
         "nav_diagnose": "🩺 Leaf Diagnosis",
         "nav_crops": "🌱 Supported Crops (38 Classes)",
         "nav_about": "📊 Benchmark Metrics & Architecture",
@@ -134,7 +153,8 @@ UI = {
     },
     "हिन्दी (Hindi)": {
         "title": "🌿 क्रॉपशील्ड (CropShield AI)",
-        "tagline": "उन्नत फसल रोग पहचान, पत्ती सत्यापन एवं सटीक उपचार परामर्श प्रणाली",
+        "tagline": "भारतीय कृषि के लिए कंप्यूटर विज़न आधारित फसल रोग पहचान एवं उपचार प्रणाली",
+        "nav_overview": "🌾 भारतीय कृषि एवं फसलें",
         "nav_diagnose": "🩺 पत्ती जाँच व निदान",
         "nav_crops": "🌱 समर्थित फसलें (38 रोग)",
         "nav_about": "📊 मॉडल शुद्धता व रिपोर्ट",
@@ -197,7 +217,7 @@ def get_healthy_reference_image(crop_name: str):
 
 detector, gradcam, all_remedies, kvk_directory = load_assets()
 
-# Sidebar: Language & Navigation (Zero SIH Mentions)
+# Sidebar: Language & Navigation
 with st.sidebar:
     st.markdown("### 🌿 CropShield Navigation")
     
@@ -208,7 +228,7 @@ with st.sidebar:
     st.markdown("---")
     page = st.radio(
         "Select Portal Section",
-        [t["nav_diagnose"], t["nav_crops"], t["nav_about"], t["nav_kvk"]],
+        [t["nav_overview"], t["nav_diagnose"], t["nav_crops"], t["nav_about"], t["nav_kvk"]],
         label_visibility="collapsed"
     )
     
@@ -226,9 +246,90 @@ st.markdown(f"""
 
 
 # ==========================================
+# PAGE 0: INTRO - INDIAN FARMING & CROPS
+# ==========================================
+if page == t["nav_overview"]:
+    st.subheader("🌾 Crop Cultivation Across Diverse Agro-Climatic Zones of India")
+    st.write(
+        "India is the world's second-largest agricultural producer. Diverse topographies, rainfall patterns, "
+        "and soil types allow for distinct horticultural and staple crop belts across different states. "
+        "Below is how the **14 key crops supported by CropShield** are cultivated across India's premier farming zones:"
+    )
+
+    r1, r2 = st.columns(2)
+    with r1:
+        st.markdown("""
+        <div class="region-card">
+            <div class="region-title">🍎 1. Himalayan Temperate Zone (North & Northwest)</div>
+            <b>Key States:</b> Himachal Pradesh, Jammu & Kashmir, Uttarakhand<br/>
+            <b>Crops Covered in CropShield:</b> <b>Apple, Peach, Cherry</b><br/>
+            <b>Farming Practice & Climate:</b> High-altitude terraced farming, cold winters, moderate rainfall, well-drained loamy soil. Requires careful chilling-hour management.<br/>
+            <b>Major Vulnerabilities:</b> Fungal leaf scabs, powdery mildews, and rusts triggered by humid snow-melt springs and monsoons.
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="region-card">
+            <div class="region-title">🌽 2. Indo-Gangetic Plains & Central India</div>
+            <b>Key States:</b> Uttar Pradesh, Punjab, Bihar, Madhya Pradesh, Haryana<br/>
+            <b>Crops Covered in CropShield:</b> <b>Potato, Corn (Maize), Soybean, Tomato</b><br/>
+            <b>Farming Practice & Climate:</b> Intensive alluvial flat-land farming, canal and tubewell irrigation. Multi-cropping seasons (Kharif, Rabi, and Zaid).<br/>
+            <b>Major Vulnerabilities:</b> Early and Late Blights in winter potatoes/tomatoes during fog and overcast dew periods; leaf blights and rusts in maize.
+        </div>
+        """, unsafe_allow_html=True)
+
+    with r2:
+        st.markdown("""
+        <div class="region-card">
+            <div class="region-title">🍇 3. Deccan Plateau & Western Semiarid Belt</div>
+            <b>Key States:</b> Maharashtra, Karnataka, Telangana, Gujarat<br/>
+            <b>Crops Covered in CropShield:</b> <b>Grape, Bell Pepper (Capsicum), Tomato, Squash</b><br/>
+            <b>Farming Practice & Climate:</b> Black cotton soil (Regur) and red loam. High adoption of drip irrigation, polyhouses for capsicum, and trellised commercial vineyards in Nashik and Sangli.<br/>
+            <b>Major Vulnerabilities:</b> Grape black rot, downy/powdery mildew during post-monsoon cane maturity, and bacterial spots in peppers.
+        </div>
+        """, unsafe_allow_html=True)
+
+        st.markdown("""
+        <div class="region-card">
+            <div class="region-title">🍊 4. Subtropical & Coastal Horticulture Belts</div>
+            <b>Key States:</b> Punjab/Rajasthan (Citrus), Andhra Pradesh, Tamil Nadu, Mahabaleshwar (Maharashtra)<br/>
+            <b>Crops Covered in CropShield:</b> <b>Orange (Citrus), Strawberry, Blueberry, Raspberry</b><br/>
+            <b>Farming Practice & Climate:</b> Specialized microclimates — frost-free citrus belts, hill-station strawberry bed cultivation with plastic mulching, and open-field subtropical orchards.<br/>
+            <b>Major Vulnerabilities:</b> Citrus Huanglongbing (Greening) spread by psyllid vectors, strawberry leaf scorch, and soil-borne fungal pathogens.
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+    st.markdown("### 🎯 Why Early AI Disease Diagnosis Matters for Indian Farmers")
+    
+    col_feat1, col_feat2, col_feat3 = st.columns(3)
+    with col_feat1:
+        st.markdown("""
+        <div class="step-box">
+            <div class="step-num">🚨 Yield Protection</div>
+            <div class="step-text">Late blight in potatoes and tomatoes can destroy an entire field within <b>7 to 10 days</b> of visible onset if untreated.</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_feat2:
+        st.markdown("""
+        <div class="step-box">
+            <div class="step-num">💰 Reduced Chemical Cost</div>
+            <div class="step-text">Over-spraying broad-spectrum fungicides drains farmer income. CropShield specifies exact pathogen classes (fungal, bacterial, viral).</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_feat3:
+        st.markdown("""
+        <div class="step-box">
+            <div class="step-num">📱 Instant Accessibility</div>
+            <div class="step-text">Bypasses long turnaround times for physical lab visits by delivering instant verified diagnosis directly on the smartphone.</div>
+        </div>
+        """, unsafe_allow_html=True)
+
+
+# ==========================================
 # PAGE 1: DIAGNOSIS & TREATMENT (CORE APP)
 # ==========================================
-if page == t["nav_diagnose"]:
+elif page == t["nav_diagnose"]:
     # 1. Intuitive 3-Step Workflow Banner (Clean, Practical, Symmetrical)
     col_s1, col_s2, col_s3 = st.columns(3)
     with col_s1:
