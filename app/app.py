@@ -976,20 +976,26 @@ elif page == t["nav_crops"]:
 
     # 3. Pathological Conditions Library for Selected Crop
     st.markdown(f"#### 🛡️ Pathological Conditions Screened for {inspect_crop.replace('_', ' ')}")
+    st.caption("Verified leaf visual sample, biological classification, foliar symptoms, and cultural preventive actions for every condition:")
     crop_classes = [c for c in CLASSES if c.startswith(inspect_crop + "___")]
 
     cols = st.columns(len(crop_classes) if len(crop_classes) <= 3 else 3)
     for idx, c in enumerate(crop_classes):
         with cols[idx % 3]:
             info = remedies[c]
+            sample_path = Path("demo_images") / f"{c}.jpg"
+            if sample_path.exists():
+                sample_img = Image.open(sample_path)
+                st.image(sample_img.resize((240, 240)), caption=f"🔬 {info['name']}", use_container_width=True)
+            
             st.markdown(f"""
-            <div class="cs-card" style="height: 100%;">
+            <div class="cs-card" style="margin-top: -6px; margin-bottom: 20px;">
                 <h4 style="margin-top:0; color:#2e7d32;">{info['name']}</h4>
-                <b>Pathogen Type:</b> {info['type'].title()}<br/><br/>
-                <p><b>Visible Symptoms:</b><br/>{info['symptoms']}</p>
-                <div style="background: rgba(46, 125, 50, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #2e7d32; margin-top: 6px;">
+                <p><b>Pathogen Type:</b> <span style="background:rgba(46, 125, 50, 0.12); padding: 2px 8px; border-radius: 4px; font-weight:600;">{info['type'].title()}</span></p>
+                <p style="font-size: 0.9rem;"><b>Visible Symptoms:</b><br/>{info['symptoms']}</p>
+                <div style="background: rgba(46, 125, 50, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #2e7d32; margin-top: 6px; font-size: 0.88rem;">
                     <b>Cultural Prevention:</b><br/>
-                    {info['prevention'][0] if info['prevention'] else 'Standard cultural sanitation'}
+                    {info['prevention'][0] if info['prevention'] else 'Standard field sanitation and air circulation'}
                 </div>
             </div>
             """, unsafe_allow_html=True)
