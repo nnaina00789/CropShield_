@@ -385,6 +385,87 @@ def get_healthy_reference_image(crop_name: str):
         return Image.open(demo_path)
     return None
 
+@st.cache_data
+def get_india_svg(selected_region: str) -> str:
+    map_file = Path("app/india_map.json")
+    if not map_file.exists():
+        return "<p>Map data unavailable.</p>"
+    with open(map_file, encoding="utf-8") as f:
+        data = json.load(f)
+
+    himalayan = {"Himachal Pradesh", "Jammu and Kashmir", "Uttarakhand"}
+    indo_gangetic = {
+        "Punjab", "Haryana", "Chandigarh", "Delhi", "Uttar Pradesh",
+        "Bihar", "Madhya Pradesh", "West Bengal", "Jharkhand", "Chhattisgarh", "Rajasthan"
+    }
+    deccan = {
+        "Maharashtra", "Gujarat", "Goa", "Dadra and Nagar Haveli",
+        "Daman and Diu", "Karnataka", "Telangana"
+    }
+
+    ZONE_COLORS = {
+        "🍎 Himalayan Temperate Zone (North)": "#0288d1",
+        "🌽 Indo-Gangetic Plains (North & Central)": "#e65100",
+        "🍇 Deccan Plateau & Western Semiarid Belt": "#7b1fa2",
+        "🍊 Subtropical & Coastal Horticulture Belts": "#2e7d32",
+    }
+    active_color = ZONE_COLORS.get(selected_region, "#2e7d32")
+
+    path_items = []
+    for loc in data["locations"]:
+        name = loc["name"]
+        d = loc["path"]
+        loc_id = loc["id"]
+
+        if name in himalayan:
+            z = "🍎 Himalayan Temperate Zone (North)"
+        elif name in indo_gangetic:
+            z = "🌽 Indo-Gangetic Plains (North & Central)"
+        elif name in deccan:
+            z = "🍇 Deccan Plateau & Western Semiarid Belt"
+        else:
+            z = "🍊 Subtropical & Coastal Horticulture Belts"
+
+        is_active = (z == selected_region)
+
+        if is_active:
+            fill = active_color
+            fill_op = "0.95"
+            stroke = "#ffffff"
+            sw = "1.8"
+        else:
+            fill = "#90a4ae"
+            fill_op = "0.35"
+            stroke = "#607d8b"
+            sw = "0.8"
+
+        title_text = f"{name} &#10;Farming Belt: {z.split('(')[0].strip()}"
+        path_items.append(
+            f'<path d="{d}" id="{loc_id}" fill="{fill}" fill-opacity="{fill_op}" '
+            f'stroke="{stroke}" stroke-width="{sw}" style="transition: all 0.3s ease; cursor: pointer;">'
+            f'<title>{title_text}</title>'
+            f'</path>'
+        )
+
+    paths_str = "\n".join(path_items)
+
+    svg_markup = f"""
+    <div style="background-color: var(--secondary-background-color); border: 1px solid rgba(128,128,128,0.2); border-radius: 10px; padding: 14px 10px 10px 10px; text-align: center;">
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 696" width="100%" height="auto" style="max-height: 440px; display: block; margin: auto;">
+            <g id="india-map-group">
+                {paths_str}
+            </g>
+        </svg>
+        <div style="margin-top: 10px; font-size: 0.9rem; opacity: 0.95;">
+            <b>Active Farming Belt:</b> <span style="color:{active_color}; font-weight:700;">{selected_region.split('(')[0].strip()}</span>
+        </div>
+        <div style="font-size: 0.78rem; opacity: 0.7; margin-top: 2px;">
+            Hover any state to inspect name & agricultural zone
+        </div>
+    </div>
+    """
+    return svg_markup
+
 detector, gradcam, all_remedies, kvk_directory = load_assets()
 
 # Sidebar: Language & Navigation
@@ -521,7 +602,7 @@ if page == t["nav_overview"]:
         st.session_state["selected_region"] = list(AGRO_REGIONS.keys())[1]
 
     # Quick Selection Buttons for Farming Belts
-    st.markdown("📍 **Select Agricultural Belt (Click any button below or click directly on the India map):**")
+    st.markdown("📍 **Select Agricultural Belt to Highlight on the Map of India:**")
     b_cols = st.columns(4)
     for i, (r_key, r_val) in enumerate(AGRO_REGIONS.items()):
         with b_cols[i]:
@@ -541,77 +622,7 @@ if page == t["nav_overview"]:
     col_map, col_details = st.columns([1.1, 1.3], gap="medium")
 
     with col_map:
-        map_df = pd.DataFrame([
-            {
-                "name": k,
-                "short_name": v.get("short_name", k.split("(")[0].strip()),
-                "lat": v["lat"],
-                "lon": v["lon"],
-                "color": [46, 125, 50, 230] if k == selected_reg_name else [230, 81, 0, 210],
-                "radius": 110000 if k == selected_reg_name else 70000
-            }
-            for k, v in AGRO_REGIONS.items()
-        ])
-
-        # Centered strictly on India (straight 2D top-down view)
-        view_state = pdk.ViewState(
-            latitude=22.2,
-            longitude=79.2,
-            zoom=4.2,
-            min_zoom=3.8,
-            max_zoom=6.5,
-            pitch=0,
-            bearing=0
-        )
-
-        layer_pts = pdk.Layer(
-            "ScatterplotLayer",
-            data=map_df,
-            id="agro-regions-points",
-            get_position="[lon, lat]",
-            get_color="color",
-            get_radius="radius",
-            pickable=True,
-            auto_highlight=True,
-        )
-
-        layer_txt = pdk.Layer(
-            "TextLayer",
-            data=map_df,
-            id="agro-regions-labels",
-            get_position="[lon, lat]",
-            get_text="short_name",
-            get_size=13,
-            get_color="[20, 60, 25, 255]",
-            get_alignment_baseline="'bottom'",
-            get_text_anchor="'middle'",
-            pickable=False,
-        )
-
-        deck = pdk.Deck(
-            layers=[layer_pts, layer_txt],
-            initial_view_state=view_state,
-            tooltip={"html": "<b>{name}</b><br/>👉 Click to select this zone", "style": {"backgroundColor": "#2e7d32", "color": "white"}},
-            map_style="light"
-        )
-
-        map_event = st.pydeck_chart(
-            deck,
-            on_select="rerun",
-            selection_mode="single-object",
-            key="india_map_chart"
-        )
-
-        # Handle map marker click event
-        if map_event and hasattr(map_event, "selection") and map_event.selection:
-            sel_objs = map_event.selection.get("objects", {}).get("agro-regions-points", [])
-            if sel_objs and len(sel_objs) > 0:
-                clicked_zone = sel_objs[0].get("name")
-                if clicked_zone and clicked_zone in AGRO_REGIONS and clicked_zone != selected_reg_name:
-                    st.session_state["selected_region"] = clicked_zone
-                    st.rerun()
-
-        st.caption("🟢 Green marker = Active zone. 🟠 Orange markers = Click to inspect. Map centered on India.")
+        st.markdown(get_india_svg(selected_reg_name), unsafe_allow_html=True)
 
     with col_details:
         st.markdown(f"""
