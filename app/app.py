@@ -117,9 +117,9 @@ UI = {
     "English": {
         "title": "🌿 CropShield AI",
         "tagline": "Empowering Indian Agriculture with Computer Vision & Targeted Crop Health Diagnostics",
-        "nav_overview": "🌾 Indian Agriculture & Crops",
+        "nav_overview": "🌾 Indian Agriculture & Farming Belts",
         "nav_diagnose": "🩺 Leaf Diagnosis",
-        "nav_crops": "🌱 Supported Crops (38 Classes)",
+        "nav_crops": "🔬 Crop Pathology & Simulator",
         "nav_about": "📊 Benchmark Metrics & Architecture",
         "nav_kvk": "🏛️ KVK & Farmer Helplines",
         "step1_title": "1. 📸 Capture / Upload",
@@ -156,9 +156,9 @@ UI = {
     "हिन्दी (Hindi)": {
         "title": "🌿 क्रॉपशील्ड (CropShield AI)",
         "tagline": "भारतीय कृषि के लिए कंप्यूटर विज़न आधारित फसल रोग पहचान एवं उपचार प्रणाली",
-        "nav_overview": "🌾 भारतीय कृषि एवं फसलें",
+        "nav_overview": "🌾 भारतीय कृषि एवं कृषि क्षेत्र",
         "nav_diagnose": "🩺 पत्ती जाँच व निदान",
-        "nav_crops": "🌱 समर्थित फसलें (38 रोग)",
+        "nav_crops": "🔬 फसल रोग विज्ञान (Pathology)",
         "nav_about": "📊 मॉडल शुद्धता व रिपोर्ट",
         "nav_kvk": "🏛️ कृषि विज्ञान केंद्र (KVK)",
         "step1_title": "1. 📸 फोटो चुनें / खींचें",
@@ -641,168 +641,26 @@ if page == t["nav_overview"]:
         </div>
         """, unsafe_allow_html=True)
 
-    # Live Leaf Preview for Crops in Zone
-    st.markdown(f"##### 🌿 Certified Leaf Baselines for {selected_reg_name.split('(')[0]}")
-    crop_cols = st.columns(len(reg_data["crops"]))
-    for i, c_name in enumerate(reg_data["crops"]):
-        with crop_cols[i]:
-            healthy_img = get_healthy_reference_image(c_name)
-            if healthy_img:
-                st.image(healthy_img.resize((180, 180)), caption=f"{c_name.replace('_', ' ')} (Certified Leaf)", use_container_width=True)
-            else:
-                st.caption(f"{c_name.replace('_', ' ')}")
-
     st.markdown("---")
 
-    # 4. Micro-Climate Disease Outbreak Simulator (Real-Time Pathology Predictor)
-    st.markdown("#### 🔬 Real-Time Micro-Climate Outbreak Simulator")
-    st.write(
-        "Plant pathogens (fungal spores, bacteria, and viral vectors) require specific micro-climatic thresholds to germinate and spread. "
-        "Adjust the environmental sliders below to simulate live field conditions and calculate the disease outbreak probability:"
-    )
-
-    sim_c1, sim_c2 = st.columns([1.2, 1.2], gap="large")
-
-    with sim_c1:
-        st.markdown("##### ⚙️ Environmental Controls")
-        sim_crop = st.selectbox(
-            "Select Crop to Simulate:",
-            ["Potato", "Tomato", "Apple", "Grape", "Corn_(maize)", "Pepper,_bell", "Orange", "Squash"],
-            index=0
-        )
-        sim_temp = st.slider("🌡️ Daytime Temperature (°C):", min_value=10, max_value=42, value=18, step=1)
-        sim_humidity = st.slider("💧 Relative Humidity (%):", min_value=20, max_value=100, value=85, step=1)
-        sim_wet_hours = st.slider("🌿 Continuous Leaf Wetness / Dew (Hours):", min_value=0, max_value=24, value=10, step=1)
-
-    with sim_c2:
-        st.markdown("##### 📊 Pathological Outbreak Calculation")
-        # Agronomic pathology simulation based on Wallin / Smith criteria
-        risk_score = 15
-        pathogen_name = "None detected (Normal micro-flora)"
-        alert_level = "LOW"
-        action_advice = "Field conditions are within safe agronomic parameters. Continue standard routine scouting."
-
-        if sim_crop in ["Potato", "Tomato"]:
-            if 12 <= sim_temp <= 22 and sim_humidity >= 80 and sim_wet_hours >= 8:
-                risk_score = min(98, 40 + int(sim_wet_hours * 3.5) + int((sim_humidity - 70) * 1.5))
-                pathogen_name = "Late Blight (Phytophthora infestans)"
-                alert_level = "CRITICAL"
-                action_advice = "🚨 High outbreak risk! Late blight sporangia germinate rapidly in cool, dew-saturated foliage. Apply protective copper or systemic fungicide before full canopy infection."
-            elif 22 <= sim_temp <= 30 and sim_humidity >= 70 and sim_wet_hours >= 4:
-                risk_score = min(88, 30 + int(sim_wet_hours * 3.0) + int((sim_humidity - 60) * 1.2))
-                pathogen_name = "Early Blight (Alternaria solani)"
-                alert_level = "MODERATE"
-                action_advice = "⚠️ Alternaria conidia require alternating wet and warm periods. Remove lower infected leaves and avoid overhead irrigation."
-            elif sim_temp >= 32 and sim_humidity <= 50:
-                risk_score = 72
-                pathogen_name = "Spider Mites / Whitefly TYLCV Vector"
-                alert_level = "MODERATE"
-                action_advice = "Hot, dry conditions accelerate mite reproduction and whitefly migration. Monitor underside of leaves."
-
-        elif sim_crop in ["Apple", "Cherry"]:
-            if 14 <= sim_temp <= 24 and sim_humidity >= 75 and sim_wet_hours >= 6:
-                risk_score = min(92, 35 + int(sim_wet_hours * 3.5))
-                pathogen_name = "Apple Scab (Venturia inaequalis)"
-                alert_level = "CRITICAL"
-                action_advice = "🚨 Mills Period met: Ascospores discharge during prolonged leaf wetness. Fungicidal protection needed within 48 hours."
-            elif 18 <= sim_temp <= 28 and 50 <= sim_humidity <= 75 and sim_wet_hours < 4:
-                risk_score = 65
-                pathogen_name = "Powdery Mildew (Podosphaera leucotricha)"
-                alert_level = "MODERATE"
-                action_advice = "Mildew conidia germinate in warm, humid air without free leaf moisture. Prune dense inner canopy for airflow."
-
-        elif sim_crop == "Grape":
-            if 20 <= sim_temp <= 30 and sim_humidity >= 75 and sim_wet_hours >= 6:
-                risk_score = min(90, 40 + int(sim_wet_hours * 3.2))
-                pathogen_name = "Black Rot (Guignardia bidwellii)"
-                alert_level = "CRITICAL"
-                action_advice = "🚨 Warm rain and leaf wetness trigger pycnidiospore infection on young leaves and berry clusters."
-            else:
-                risk_score = 30
-
-        elif sim_crop == "Corn_(maize)":
-            if 18 <= sim_temp <= 28 and sim_humidity >= 80 and sim_wet_hours >= 6:
-                risk_score = 78
-                pathogen_name = "Northern Corn Leaf Blight (Exserohilum turcicum)"
-                alert_level = "MODERATE"
-                action_advice = "Heavy dews and moderate temperatures favor cigar-shaped necrotic lesions. Ensure crop rotation and residue management."
-            else:
-                risk_score = 25
-
-        elif sim_crop == "Pepper,_bell":
-            if 24 <= sim_temp <= 32 and sim_humidity >= 80 and sim_wet_hours >= 5:
-                risk_score = 84
-                pathogen_name = "Bacterial Spot (Xanthomonas campestris)"
-                alert_level = "CRITICAL"
-                action_advice = "Bacterial pathogens enter via stomata during wind-driven rain and high heat. Avoid handling plants when foliage is wet."
-            else:
-                risk_score = 30
-        else:
-            if sim_humidity >= 80 and sim_wet_hours >= 6:
-                risk_score = 60
-                pathogen_name = "General Foliar Fungal Complex"
-                alert_level = "MODERATE"
-                action_advice = "High moisture creates potential for fungal germination. Monitor leaf margins."
-
-        # Display Result Gauge
-        if alert_level == "CRITICAL":
-            st.error(f"🚨 **Calculated Outbreak Risk: {risk_score}% — CRITICAL ALERT**")
-        elif alert_level == "MODERATE":
-            st.warning(f"⚠️ **Calculated Outbreak Risk: {risk_score}% — MODERATE RISK**")
-        else:
-            st.success(f"🟢 **Calculated Outbreak Risk: {risk_score}% — LOW / SAFE**")
-
-        st.progress(risk_score / 100.0)
-        st.markdown(f"**🔬 Predicted Pathogen:** `{pathogen_name}`")
-        st.info(f"**💡 Agronomic Advisory:** {action_advice}")
-
-    st.markdown("---")
-
-    # 5. 14-Crop Deep-Dive Directory
-    st.markdown("#### 📚 Crop Pathology & Agronomy Library (14 Species)")
-    st.write("Browse all 14 crop species supported by CropShield to view their state distribution, soil preferences, and disease profiles:")
-
-    inspect_crop = st.selectbox(
-        "Choose Crop to Inspect:",
-        list(CROP_CATALOG.keys()),
-        format_func=lambda x: f"{x.replace('_', ' ')} ({CROP_CATALOG[x]['hindi']})"
-    )
-    c_info = CROP_CATALOG[inspect_crop]
-
-    c_c1, c_c2 = st.columns([1, 2], gap="medium")
-    with c_c1:
-        c_img = get_healthy_reference_image(inspect_crop)
-        if c_img:
-            st.image(c_img.resize((240, 240)), caption=f"Certified Healthy {inspect_crop.replace('_', ' ')} Leaf", use_container_width=True)
-        else:
-            st.info("Certified Leaf Baseline")
-    with c_c2:
-        st.markdown(f"""
-        <div class="cs-card">
-            <h3 style="margin-top:0; color:#2e7d32;">{inspect_crop.replace('_', ' ')} ({c_info['hindi']})</h3>
-            <p><b>📍 Premier Growing States:</b> {c_info['states']}</p>
-            <p><b>🗓️ Primary Season:</b> {c_info['season']}</p>
-            <p><b>🌍 Preferred Soil & pH:</b> {c_info['soil']}</p>
-            <p><b>📈 Economic Fact:</b> {c_info['economic_fact']}</p>
-            <p><b>🛡️ Monitored Pathologies in CropShield:</b></p>
-            <ul>
-                {''.join([f'<li><b>{d}</b></li>' for d in c_info['diseases']])}
-            </ul>
-        </div>
-        """, unsafe_allow_html=True)
-
-    st.markdown("---")
-
-    # 6. Immediate CTA Banner to Diagnosis
-    cta_col1, cta_col2 = st.columns([2.5, 1])
+    # Clean Call to Action to Diagnosis and Pathology
+    cta_col1, cta_col2 = st.columns([1.5, 1.5], gap="medium")
     with cta_col1:
         st.markdown("""
-        ### Ready to analyze a leaf from your field?
-        Switch directly to the **Leaf Diagnosis** engine to screen for 38 conditions with Grad-CAM heatmaps and export an official PDF advisory.
-        """)
+        <div class="cs-card" style="text-align: center;">
+            <h4 style="margin-top:0; color:#2e7d32;">🩺 Field Leaf Diagnosis Engine</h4>
+            <p style="font-size:0.92rem; opacity:0.9;">Screen crop leaves with <b>LeafDetector OOD rejection</b> and <b>Grad-CAM lesion heatmaps</b>. Get verified guidance and download an official advisory PDF.</p>
+            <p style="font-size:0.85rem; color:#2e7d32; font-weight:600;">👉 Select "🩺 Leaf Diagnosis" from the sidebar menu</p>
+        </div>
+        """, unsafe_allow_html=True)
     with cta_col2:
-        st.markdown("<br/>", unsafe_allow_html=True)
-        st.info("👉 Use the **Sidebar Menu** to open **🩺 Leaf Diagnosis**")
+        st.markdown("""
+        <div class="cs-card" style="text-align: center;">
+            <h4 style="margin-top:0; color:#1565c0;">🔬 Crop Pathology & Simulator</h4>
+            <p style="font-size:0.92rem; opacity:0.9;">Access the real-time micro-climate risk calculator (Wallin/Smith criteria), certified leaf baselines, and complete 38-disease library.</p>
+            <p style="font-size:0.85rem; color:#1565c0; font-weight:600;">👉 Select "🔬 Crop Pathology & Simulator" from the sidebar menu</p>
+        </div>
+        """, unsafe_allow_html=True)
 
 
 # ==========================================
@@ -975,26 +833,164 @@ elif page == t["nav_diagnose"]:
 
 
 # ==========================================
-# PAGE 2: SUPPORTED CROPS DIRECTORY
+# PAGE 2: CROP PATHOLOGY & OUTBREAK SIMULATOR
 # ==========================================
 elif page == t["nav_crops"]:
-    st.subheader("🌱 Supported Crops & Pathogen Library (38 Classes)")
-    st.write("Browse all 14 crops and 38 conditions recognized by CropShield:")
+    st.subheader("🔬 Crop Pathology, Outbreak Simulator & 38-Disease Library")
+    st.write(
+        "Explore real-time micro-climatic disease outbreak dynamics, certified healthy leaf references, "
+        "and complete pathological profiles across all 14 crop species and 38 conditions recognized by CropShield:"
+    )
 
-    crops = sorted(list(set(c.split("___")[0] for c in CLASSES)))
-    chosen_crop = st.selectbox("Select Crop to Explore:", crops)
+    # 1. Micro-Climate Disease Outbreak Simulator (Real-Time Pathology Predictor)
+    st.markdown("#### 🌡️ Real-Time Micro-Climate Outbreak Simulator")
+    st.write(
+        "Foliar pathogens (fungal spores, bacteria, and viral vectors) require specific micro-climatic thresholds to germinate and infect. "
+        "Adjust the environmental sliders below to simulate field conditions and calculate the outbreak probability:"
+    )
 
-    crop_classes = [c for c in CLASSES if c.startswith(chosen_crop + "___")]
-    
+    sim_c1, sim_c2 = st.columns([1.2, 1.2], gap="large")
+
+    with sim_c1:
+        st.markdown("##### ⚙️ Environmental Field Controls")
+        sim_crop = st.selectbox(
+            "Select Crop to Simulate:",
+            ["Potato", "Tomato", "Apple", "Grape", "Corn_(maize)", "Pepper,_bell", "Orange", "Squash"],
+            index=0
+        )
+        sim_temp = st.slider("🌡️ Daytime Temperature (°C):", min_value=10, max_value=42, value=18, step=1)
+        sim_humidity = st.slider("💧 Relative Humidity (%):", min_value=20, max_value=100, value=85, step=1)
+        sim_wet_hours = st.slider("🌿 Continuous Leaf Wetness / Dew (Hours):", min_value=0, max_value=24, value=10, step=1)
+
+    with sim_c2:
+        st.markdown("##### 📊 Pathological Outbreak Calculation")
+        risk_score = 15
+        pathogen_name = "None detected (Normal micro-flora)"
+        alert_level = "LOW"
+        action_advice = "Field conditions are within safe agronomic parameters. Continue standard routine scouting."
+
+        if sim_crop in ["Potato", "Tomato"]:
+            if 12 <= sim_temp <= 22 and sim_humidity >= 80 and sim_wet_hours >= 8:
+                risk_score = min(98, 40 + int(sim_wet_hours * 3.5) + int((sim_humidity - 70) * 1.5))
+                pathogen_name = "Late Blight (Phytophthora infestans)"
+                alert_level = "CRITICAL"
+                action_advice = "🚨 High outbreak risk! Late blight sporangia germinate rapidly in cool, dew-saturated foliage. Apply protective copper or systemic fungicide before full canopy infection."
+            elif 22 <= sim_temp <= 30 and sim_humidity >= 70 and sim_wet_hours >= 4:
+                risk_score = min(88, 30 + int(sim_wet_hours * 3.0) + int((sim_humidity - 60) * 1.2))
+                pathogen_name = "Early Blight (Alternaria solani)"
+                alert_level = "MODERATE"
+                action_advice = "⚠️ Alternaria conidia require alternating wet and warm periods. Remove lower infected leaves and avoid overhead irrigation."
+            elif sim_temp >= 32 and sim_humidity <= 50:
+                risk_score = 72
+                pathogen_name = "Spider Mites / Whitefly TYLCV Vector"
+                alert_level = "MODERATE"
+                action_advice = "Hot, dry conditions accelerate mite reproduction and whitefly migration. Monitor underside of leaves."
+
+        elif sim_crop in ["Apple", "Cherry"]:
+            if 14 <= sim_temp <= 24 and sim_humidity >= 75 and sim_wet_hours >= 6:
+                risk_score = min(92, 35 + int(sim_wet_hours * 3.5))
+                pathogen_name = "Apple Scab (Venturia inaequalis)"
+                alert_level = "CRITICAL"
+                action_advice = "🚨 Mills Period met: Ascospores discharge during prolonged leaf wetness. Fungicidal protection needed within 48 hours."
+            elif 18 <= sim_temp <= 28 and 50 <= sim_humidity <= 75 and sim_wet_hours < 4:
+                risk_score = 65
+                pathogen_name = "Powdery Mildew (Podosphaera leucotricha)"
+                alert_level = "MODERATE"
+                action_advice = "Mildew conidia germinate in warm, humid air without free leaf moisture. Prune dense inner canopy for airflow."
+
+        elif sim_crop == "Grape":
+            if 20 <= sim_temp <= 30 and sim_humidity >= 75 and sim_wet_hours >= 6:
+                risk_score = min(90, 40 + int(sim_wet_hours * 3.2))
+                pathogen_name = "Black Rot (Guignardia bidwellii)"
+                alert_level = "CRITICAL"
+                action_advice = "🚨 Warm rain and leaf wetness trigger pycnidiospore infection on young leaves and berry clusters."
+            else:
+                risk_score = 30
+
+        elif sim_crop == "Corn_(maize)":
+            if 18 <= sim_temp <= 28 and sim_humidity >= 80 and sim_wet_hours >= 6:
+                risk_score = 78
+                pathogen_name = "Northern Corn Leaf Blight (Exserohilum turcicum)"
+                alert_level = "MODERATE"
+                action_advice = "Heavy dews and moderate temperatures favor cigar-shaped necrotic lesions. Ensure crop rotation and residue management."
+            else:
+                risk_score = 25
+
+        elif sim_crop == "Pepper,_bell":
+            if 24 <= sim_temp <= 32 and sim_humidity >= 80 and sim_wet_hours >= 5:
+                risk_score = 84
+                pathogen_name = "Bacterial Spot (Xanthomonas campestris)"
+                alert_level = "CRITICAL"
+                action_advice = "Bacterial pathogens enter via stomata during wind-driven rain and high heat. Avoid handling plants when foliage is wet."
+            else:
+                risk_score = 30
+        else:
+            if sim_humidity >= 80 and sim_wet_hours >= 6:
+                risk_score = 60
+                pathogen_name = "General Foliar Fungal Complex"
+                alert_level = "MODERATE"
+                action_advice = "High moisture creates potential for fungal germination. Monitor leaf margins."
+
+        # Display Result Gauge
+        if alert_level == "CRITICAL":
+            st.error(f"🚨 **Calculated Outbreak Risk: {risk_score}% — CRITICAL ALERT**")
+        elif alert_level == "MODERATE":
+            st.warning(f"⚠️ **Calculated Outbreak Risk: {risk_score}% — MODERATE RISK**")
+        else:
+            st.success(f"🟢 **Calculated Outbreak Risk: {risk_score}% — LOW / SAFE**")
+
+        st.progress(risk_score / 100.0)
+        st.markdown(f"**🔬 Predicted Pathogen:** `{pathogen_name}`")
+        st.info(f"**💡 Agronomic Advisory:** {action_advice}")
+
+    st.markdown("---")
+
+    # 2. 14-Crop Agronomy & Certified Leaf Profiles
+    st.markdown("#### 🌿 Crop Profile & Certified Leaf Baseline")
+    inspect_crop = st.selectbox(
+        "Choose Crop to Inspect:",
+        list(CROP_CATALOG.keys()),
+        format_func=lambda x: f"{x.replace('_', ' ')} ({CROP_CATALOG[x]['hindi']})"
+    )
+    c_info = CROP_CATALOG[inspect_crop]
+
+    c_c1, c_c2 = st.columns([1, 2], gap="medium")
+    with c_c1:
+        c_img = get_healthy_reference_image(inspect_crop)
+        if c_img:
+            st.image(c_img.resize((240, 240)), caption=f"Certified Healthy {inspect_crop.replace('_', ' ')} Leaf (Lab Baseline)", use_container_width=True)
+        else:
+            st.info("Certified Leaf Baseline Available in Dataset")
+    with c_c2:
+        st.markdown(f"""
+        <div class="cs-card">
+            <h3 style="margin-top:0; color:#2e7d32;">{inspect_crop.replace('_', ' ')} ({c_info['hindi']})</h3>
+            <p><b>📍 Premier Growing States:</b> {c_info['states']}</p>
+            <p><b>🗓️ Primary Season:</b> {c_info['season']}</p>
+            <p><b>🌍 Preferred Soil & pH:</b> {c_info['soil']}</p>
+            <p><b>📈 Economic Fact:</b> {c_info['economic_fact']}</p>
+        </div>
+        """, unsafe_allow_html=True)
+
+    st.markdown("---")
+
+    # 3. Pathological Conditions Library for Selected Crop
+    st.markdown(f"#### 🛡️ Pathological Conditions Screened for {inspect_crop.replace('_', ' ')}")
+    crop_classes = [c for c in CLASSES if c.startswith(inspect_crop + "___")]
+
     cols = st.columns(len(crop_classes) if len(crop_classes) <= 3 else 3)
     for idx, c in enumerate(crop_classes):
         with cols[idx % 3]:
             info = remedies[c]
             st.markdown(f"""
-            <div class="cs-card">
+            <div class="cs-card" style="height: 100%;">
                 <h4 style="margin-top:0; color:#2e7d32;">{info['name']}</h4>
-                <b>Type:</b> {info['type'].title()}<br/><br/>
-                <p style="font-size:0.9rem; opacity:0.9;">{info['symptoms']}</p>
+                <b>Pathogen Type:</b> {info['type'].title()}<br/><br/>
+                <p><b>Visible Symptoms:</b><br/>{info['symptoms']}</p>
+                <div style="background: rgba(46, 125, 50, 0.08); padding: 8px 12px; border-radius: 6px; border-left: 3px solid #2e7d32; margin-top: 6px;">
+                    <b>Cultural Prevention:</b><br/>
+                    {info['prevention'][0] if info['prevention'] else 'Standard cultural sanitation'}
+                </div>
             </div>
             """, unsafe_allow_html=True)
 
