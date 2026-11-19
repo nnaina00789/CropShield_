@@ -1079,10 +1079,6 @@ elif page == t["nav_crops"]:
             </div>
             """, unsafe_allow_html=True)
 
-    st.info("""
-    ℹ️ **Dataset Lineage Note:** The 38 core diagnostic classes reflect the standard PlantVillage deep learning benchmark. In that benchmark, Soybean, Blueberry, and Raspberry were curated as uninfected controls, while Orange and Squash focused on epidemic strains. CropShield integrates verified field pathology records so farmers and evaluators have a complete 360° reference of both healthy and diseased foliar states for all 14 crops.
-    """)
-
 
 # ==========================================
 # PAGE 3: KVK DIRECTORY & HELPLINES
