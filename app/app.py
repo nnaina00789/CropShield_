@@ -120,7 +120,6 @@ UI = {
         "nav_overview": "🌾 Indian Agriculture & Farming Belts",
         "nav_diagnose": "🩺 Leaf Diagnosis",
         "nav_crops": "🔬 Crop Pathology & Simulator",
-        "nav_about": "📊 Benchmark Metrics & Architecture",
         "nav_kvk": "🏛️ KVK & Farmer Helplines",
         "step1_title": "1. 📸 Capture / Upload",
         "step1_desc": "Upload a crop leaf photo or capture one using your webcam / phone camera.",
@@ -159,7 +158,6 @@ UI = {
         "nav_overview": "🌾 भारतीय कृषि एवं कृषि क्षेत्र",
         "nav_diagnose": "🩺 पत्ती जाँच व निदान",
         "nav_crops": "🔬 फसल रोग विज्ञान (Pathology)",
-        "nav_about": "📊 मॉडल शुद्धता व रिपोर्ट",
         "nav_kvk": "🏛️ कृषि विज्ञान केंद्र (KVK)",
         "step1_title": "1. 📸 फोटो चुनें / खींचें",
         "step1_desc": "फसल की पत्ती का फोटो अपलोड करें या कैमरे से लाइव फोटो लें।",
@@ -543,7 +541,7 @@ with st.sidebar:
     st.markdown("---")
     page = st.radio(
         "Select Portal Section",
-        [t["nav_overview"], t["nav_diagnose"], t["nav_crops"], t["nav_about"], t["nav_kvk"]],
+        [t["nav_overview"], t["nav_diagnose"], t["nav_crops"], t["nav_kvk"]],
         label_visibility="collapsed"
     )
     
@@ -1087,42 +1085,7 @@ elif page == t["nav_crops"]:
 
 
 # ==========================================
-# PAGE 3: BENCHMARK METRICS & ARCHITECTURE (RESUME READY)
-# ==========================================
-elif page == t["nav_about"]:
-    st.subheader("📊 Rigorous Empirical Benchmarks & Architecture")
-    st.write("Complete experimental validation across studio lab benchmark (PlantVillage) and real-world in-situ field validation (PlantDoc):")
-
-    c1, c2 = st.columns(2)
-    with c1:
-        st.markdown("#### 🔬 Studio Benchmark (PlantVillage — 54,305 Images)")
-        st.dataframe({
-            "Model": ["SimpleCNN (Baseline)", "ResNet18 (Pretrained)"],
-            "Parameters": ["399,142", "11,196,006"],
-            "Test Accuracy": ["95.47%", "99.69%"],
-            "Test Mistakes": ["246", "17 / 5,431"],
-            "Macro F1": ["0.942", "0.996"]
-        }, hide_index=True)
-
-    with c2:
-        st.markdown("#### 🌾 Real-World Field Adaptation (PlantDoc — 2,575 Images)")
-        st.dataframe({
-            "Metric": ["Top-1 Accuracy", "Top-3 Accuracy", "Crop-Level Identification", "PlantVillage Top-1"],
-            "Before Fine-Tuning": ["20.17%", "43.28%", "46.64%", "99.69%"],
-            "After Field Adaptation": ["61.34% (+41.2 pp)", "87.39% (+44.1 pp)", "79.41% (+32.8 pp)", "98.47% (Retained)"]
-        }, hide_index=True)
-
-    st.markdown("---")
-    st.markdown("#### 🛡️ LeafDetector: Out-of-Distribution Rejection Architecture")
-    st.write("""
-    - **Backbone:** Frozen ImageNet ResNet18 feature extractor (512-d embeddings).
-    - **Head:** L2-regularized binary logistic regression.
-    - **Performance:** **99.05% binary accuracy**, **0.9998 ROC-AUC**, rejecting 98.01% of non-leaf photos (faces, vehicles, objects) while maintaining 99.16% recall on real field leaves.
-    """)
-
-
-# ==========================================
-# PAGE 4: KVK DIRECTORY & HELPLINES
+# PAGE 3: KVK DIRECTORY & HELPLINES
 # ==========================================
 elif page == t["nav_kvk"]:
     st.subheader("🏛️ Krishi Vigyan Kendra (KVK) Directory & Farmer Helplines")
