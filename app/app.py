@@ -26,7 +26,7 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Dark/Light theme agnostic clean CSS - High Contrast, Employer-Grade UI
+# Custom High-Contrast, Professional Theme-Adaptive CSS
 st.markdown("""
 <style>
     /* Card Container */
@@ -37,29 +37,46 @@ st.markdown("""
         padding: 20px;
         margin-bottom: 16px;
     }
-    
-    /* Hero Title styling */
-    .cs-hero {
-        padding: 10px 0 20px 0;
-        border-bottom: 1px solid rgba(128, 128, 128, 0.2);
-        margin-bottom: 24px;
+
+    /* Workflow Steps Card */
+    .step-box {
+        background-color: var(--secondary-background-color);
+        border: 1px solid rgba(128, 128, 128, 0.2);
+        border-radius: 10px;
+        padding: 14px 16px;
+        text-align: center;
+        height: 100%;
     }
-    
+    .step-num {
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #2e7d32;
+        margin-bottom: 4px;
+    }
+    .step-text {
+        font-size: 0.9rem;
+        opacity: 0.9;
+    }
+
+    /* Hero Header */
+    .cs-hero {
+        padding: 10px 0 16px 0;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.2);
+        margin-bottom: 20px;
+    }
     .cs-title {
         font-size: 2.2rem;
         font-weight: 800;
         letter-spacing: -0.5px;
         margin: 0;
     }
-    
     .cs-tagline {
         font-size: 1.05rem;
-        color: inherit;
         opacity: 0.85;
         margin-top: 6px;
     }
 
-    /* Diagnosis Header Callout */
+    /* Diagnosis Result Banner */
     .cs-result-banner {
         background-color: rgba(46, 125, 50, 0.12);
         border-left: 6px solid #2e7d32;
@@ -67,18 +84,11 @@ st.markdown("""
         padding: 16px 20px;
         margin-bottom: 20px;
     }
-    
     .cs-result-title {
-        font-size: 1.4rem;
+        font-size: 1.5rem;
         font-weight: 700;
         color: #2e7d32;
         margin: 0;
-    }
-    
-    /* Clean list styling */
-    .cs-list-item {
-        padding: 6px 0;
-        line-height: 1.5;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -91,11 +101,21 @@ UI = {
         "nav_crops": "🌱 Supported Crops (38 Classes)",
         "nav_about": "📊 Benchmark Metrics & Architecture",
         "nav_kvk": "🏛️ KVK & Farmer Helplines",
+        "step1_title": "1. 📸 Capture / Upload",
+        "step1_desc": "Upload a crop leaf photo or capture one using your webcam / phone camera.",
+        "step2_title": "2. 🛡️ AI Verification",
+        "step2_desc": "LeafDetector validates the image, and Grad-CAM pinpoints the exact lesion.",
+        "step3_title": "3. 💊 Treatment & Report",
+        "step3_desc": "Get targeted disease guidance and download a print-ready advisory PDF.",
+        "test_guide_title": "💡 How to test the system (Quick Guide):",
+        "test_guide_1": "• **Test Crop Diseases:** Upload any sample from the `demo_images/` folder (Tomato, Potato, Corn, Grape, Apple, etc.).",
+        "test_guide_2": "• **Test 'Not a Leaf' Rejection:** Upload a photo of a face, building, pet, or random object — the gatekeeper will reject it with zero false diagnosis.",
+        "test_guide_3": "• **Field Robustness:** The classifier is fine-tuned on real in-situ farm photos (PlantDoc) to handle background soil and shadows.",
         "upload_opt": "📁 Upload Leaf Photo",
         "camera_opt": "📷 Capture Live Photo",
-        "upload_label": "Choose a clear leaf photo (JPG, PNG)",
+        "upload_label": "Upload a clear crop leaf photo (JPG, PNG)",
         "camera_label": "Capture photo with camera",
-        "your_photo": "Uploaded Leaf Photo",
+        "your_photo": "Submitted Leaf Photo",
         "heatmap": "Model Attention Map (Grad-CAM)",
         "top3": "Top-3 Diagnostic Probabilities",
         "not_a_leaf": "🚫 Validation Failed: Not a plant leaf ({leaf_prob:.0%} leaf probability). CropShield requires a clear crop leaf photo.",
@@ -119,6 +139,16 @@ UI = {
         "nav_crops": "🌱 समर्थित फसलें (38 रोग)",
         "nav_about": "📊 मॉडल शुद्धता व रिपोर्ट",
         "nav_kvk": "🏛️ कृषि विज्ञान केंद्र (KVK)",
+        "step1_title": "1. 📸 फोटो चुनें / खींचें",
+        "step1_desc": "फसल की पत्ती का फोटो अपलोड करें या कैमरे से लाइव फोटो लें।",
+        "step2_title": "2. 🛡️ एआई सत्यापन",
+        "step2_desc": "LeafDetector पत्ती की पुष्टि करता है और Grad-CAM रोग का क्षेत्र दिखाता है।",
+        "step3_title": "3. 💊 उपचार व रिपोर्ट",
+        "step3_desc": "सटीक उपचार के उपाय देखें और आधिकारिक पीडीएफ रिपोर्ट डाउनलोड करें।",
+        "test_guide_title": "💡 सिस्टम की जाँच कैसे करें (त्वरित मार्गदर्शिका):",
+        "test_guide_1": "• **फसल रोगों की जाँच:** `demo_images/` फ़ोल्डर से किसी भी पत्ती का फोटो अपलोड करें (टमाटर, आलू, मक्का, अंगूर, सेब आदि)।",
+        "test_guide_2": "• **'पत्ती नहीं है' की जाँच:** किसी चेहरे, इमारत या वस्तु का फोटो अपलोड करें — मॉडल इसे तुरंत अस्वीकार कर देगा।",
+        "test_guide_3": "• **खेत की परिस्थितियों में सटीकता:** मॉडल को खेत के वास्तविक वातावरण (मिट्टी, धूप, छाया) के लिए तैयार किया गया है।",
         "upload_opt": "📁 फोटो अपलोड करें",
         "camera_opt": "📷 कैमरे से फोटो लें",
         "upload_label": "पत्ती का फोटो चुनें (JPG, PNG)",
@@ -167,7 +197,7 @@ def get_healthy_reference_image(crop_name: str):
 
 detector, gradcam, all_remedies, kvk_directory = load_assets()
 
-# Sidebar: Language & Navigation
+# Sidebar: Language & Navigation (Zero SIH Mentions)
 with st.sidebar:
     st.markdown("### 🌿 CropShield Navigation")
     
@@ -199,39 +229,61 @@ st.markdown(f"""
 # PAGE 1: DIAGNOSIS & TREATMENT (CORE APP)
 # ==========================================
 if page == t["nav_diagnose"]:
-    # Metric Callout Strip
-    m1, m2, m3, m4 = st.columns(4)
-    m1.metric("Supported Diseases", "38 Classes", "14 Crops")
-    m2.metric("Leaf Gatekeeper", "99.05% Accuracy", "0.9998 ROC-AUC")
-    m3.metric("Field Top-3 Accuracy", "87.39%", "+44.1 pp over lab")
-    m4.metric("Studio Accuracy", "98.47%", "PlantVillage")
+    # 1. Intuitive 3-Step Workflow Banner (Clean, Practical, Symmetrical)
+    col_s1, col_s2, col_s3 = st.columns(3)
+    with col_s1:
+        st.markdown(f"""
+        <div class="step-box">
+            <div class="step-num">{t['step1_title']}</div>
+            <div class="step-text">{t['step1_desc']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_s2:
+        st.markdown(f"""
+        <div class="step-box">
+            <div class="step-num">{t['step2_title']}</div>
+            <div class="step-text">{t['step2_desc']}</div>
+        </div>
+        """, unsafe_allow_html=True)
+    with col_s3:
+        st.markdown(f"""
+        <div class="step-box">
+            <div class="step-num">{t['step3_title']}</div>
+            <div class="step-text">{t['step3_desc']}</div>
+        </div>
+        """, unsafe_allow_html=True)
 
-    st.markdown("---")
+    st.markdown("<br/>", unsafe_allow_html=True)
 
-    # Image Input Box
-    input_col1, input_col2 = st.columns([1.5, 1])
-    
-    with input_col1:
-        mode = st.radio("Photo Source", [t["upload_opt"], t["camera_opt"]], horizontal=True, label_visibility="collapsed")
+    # 2. How to Test Expander (Clean, out of the way, but easily accessible)
+    with st.expander(t["test_guide_title"], expanded=False):
+        st.markdown(f"""
+        {t['test_guide_1']}  
+        {t['test_guide_2']}  
+        {t['test_guide_3']}  
+        """)
+
+    # 3. Symmetrical, Centered Upload & Capture Area
+    _, center_col, _ = st.columns([0.2, 0.6, 0.2])
+    with center_col:
+        mode = st.radio(
+            "Input Mode",
+            [t["upload_opt"], t["camera_opt"]],
+            horizontal=True,
+            label_visibility="collapsed"
+        )
         if mode == t["upload_opt"]:
             file = st.file_uploader(t["upload_label"], type=["jpg", "jpeg", "png"])
         else:
             file = st.camera_input(t["camera_label"])
 
-    with input_col2:
-        st.markdown("""
-        **📋 How to test:**
-        - Upload any leaf photo from `demo_images/` or your own camera.
-        - **OOD Gatekeeper Test:** Upload a picture of a face, building, or pet — CropShield will automatically reject it before diagnosis.
-        - **Field Model:** Fine-tuned on real in-situ field images (PlantDoc) to handle background soil and shadows.
-        """)
-
+    # 4. Diagnostic Results (Perfect 50/50 Symmetrical Layout)
     if file:
         img = Image.open(file).convert("RGB")
         x = eval_tf(img).unsqueeze(0).to(DEVICE)
         is_leaf, leaf_prob = detector.predict(x)
 
-        # 1. Gatekeeper Check
+        # Gatekeeper Check
         if not is_leaf:
             st.error(t["not_a_leaf"].format(leaf_prob=leaf_prob))
             c_err, _ = st.columns([1, 2])
@@ -242,7 +294,7 @@ if page == t["nav_diagnose"]:
             info = remedies[raw_class]
             crop_name = raw_class.split("___")[0]
 
-            # 2. Confidence Threshold
+            # Confidence Threshold
             if conf < THRESHOLD:
                 st.warning(t["not_sure"].format(conf=conf))
                 c_warn, _ = st.columns([1, 2])
@@ -258,7 +310,8 @@ if page == t["nav_diagnose"]:
                 </div>
                 """, unsafe_allow_html=True)
 
-                res_left, res_right = st.columns([1.2, 1.4])
+                # Equal 50/50 Symmetrical Split
+                res_left, res_right = st.columns([1, 1], gap="large")
 
                 with res_left:
                     # Key Metrics
@@ -269,7 +322,7 @@ if page == t["nav_diagnose"]:
                     if raw_class.endswith("___healthy"):
                         st.success(t["healthy_msg"])
 
-                    # Side-by-side images
+                    # Symmetrical Side-by-Side Images
                     i1, i2 = st.columns(2)
                     i1.image(img.resize((224, 224)), caption=t["your_photo"], use_container_width=True)
                     heatmap_overlay_img = Image.fromarray((overlay(img, heat) * 255).astype(np.uint8))
