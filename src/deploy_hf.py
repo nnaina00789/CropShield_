@@ -14,31 +14,11 @@ title: CropShield
 emoji: 🌿
 colorFrom: green
 colorTo: emerald
-sdk: docker
-app_port: 7860
+sdk: streamlit
+app_file: app.py
 pinned: false
 ---
 """
-
-DOCKERFILE = """FROM python:3.11-slim
-
-WORKDIR /app
-
-COPY requirements.txt ./
-RUN pip install --no-cache-dir --extra-index-url https://download.pytorch.org/whl/cpu -r requirements.txt
-
-COPY app/ ./app/
-COPY src/ ./src/
-COPY splits/train.csv ./splits/train.csv
-COPY checkpoints/leaf_detector.pt ./checkpoints/leaf_detector.pt
-COPY checkpoints/resnet18_field.pt ./checkpoints/resnet18_field.pt
-COPY demo_images/ ./demo_images/
-
-EXPOSE 7860
-
-CMD ["streamlit", "run", "app/app.py", "--server.port=7860", "--server.address=0.0.0.0"]
-"""
-
 
 def prepare_bundle(bundle_dir: Path, readme_body: str):
     import shutil
@@ -48,9 +28,11 @@ def prepare_bundle(bundle_dir: Path, readme_body: str):
     bundle_dir.mkdir(parents=True, exist_ok=True)
 
     (bundle_dir / "README.md").write_text(SPACE_README_HEADER + "\n" + readme_body, encoding="utf-8")
-    (bundle_dir / "Dockerfile").write_text(DOCKERFILE, encoding="utf-8")
     shutil.copy("requirements.txt", bundle_dir / "requirements.txt")
-    shutil.copytree("app", bundle_dir / "app")
+    shutil.copy("app/app.py", bundle_dir / "app.py")
+    (bundle_dir / "app").mkdir(exist_ok=True)
+    shutil.copy("app/remedies.json", bundle_dir / "app/remedies.json")
+    shutil.copy("app/remedies_hi.json", bundle_dir / "app/remedies_hi.json")
     shutil.copytree("src", bundle_dir / "src", ignore=shutil.ignore_patterns("__pycache__"))
     (bundle_dir / "splits").mkdir(exist_ok=True)
     shutil.copy("splits/train.csv", bundle_dir / "splits/train.csv")
@@ -82,7 +64,7 @@ def main():
     repo_id = args.space or f"{username}/CropShield"
 
     print(f"Creating / updating Hugging Face Space: {repo_id} ...")
-    create_repo(repo_id=repo_id, token=args.token, repo_type="space", space_sdk="docker", exist_ok=True)
+    create_repo(repo_id=repo_id, token=args.token, repo_type="space", space_sdk="streamlit", exist_ok=True)
     upload_folder(
         repo_id=repo_id,
         folder_path=str(bundle_dir),
