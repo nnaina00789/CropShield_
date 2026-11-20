@@ -32,6 +32,24 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
     
+    .stApp {
+        background-color: var(--background-color);
+        background-image: 
+            radial-gradient(circle at 92% 10%, rgba(16, 185, 129, 0.05) 0%, transparent 45%),
+            radial-gradient(circle at 8% 85%, rgba(5, 150, 105, 0.035) 0%, transparent 45%),
+            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath d='M25,75 C25,40 55,20 80,20 C80,55 60,75 25,75 Z' fill='none' stroke='%2310b981' stroke-width='1.2' stroke-opacity='0.035'/%3E%3Cpath d='M25,75 C45,52 80,20' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.03'/%3E%3Cpath d='M40,60 C52,62 60,57' fill='none' stroke='%2310b981' stroke-width='0.8' stroke-opacity='0.025'/%3E%3Cpath d='M52,47 C60,50 67,42' fill='none' stroke='%2310b981' stroke-width='0.8' stroke-opacity='0.025'/%3E%3Cpath d='M120,150 L120,95' stroke='%2310b981' stroke-width='1.2' stroke-opacity='0.035'/%3E%3Cpath d='M120,140 Q108,133 108,126 Q120,129 120,140' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.035'/%3E%3Cpath d='M120,140 Q132,133 132,126 Q120,129 120,140' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.035'/%3E%3Cpath d='M120,124 Q108,117 108,110 Q120,113 120,124' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.035'/%3E%3Cpath d='M120,124 Q132,117 132,110 Q120,113 120,124' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.035'/%3E%3Cpath d='M120,108 Q110,102 110,96 Q120,98 120,108' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.035'/%3E%3Cpath d='M120,108 Q130,102 130,96 Q120,98 120,108' fill='none' stroke='%2310b981' stroke-width='1' stroke-opacity='0.035'/%3E%3Cpath d='M120,95 L120,82' stroke='%2310b981' stroke-width='0.9' stroke-opacity='0.03'/%3E%3Ccircle cx='135' cy='35' r='1.5' fill='%2310b981' fill-opacity='0.035'/%3E%3Ccircle cx='40' cy='135' r='1.5' fill='%2310b981' fill-opacity='0.035'/%3E%3C/svg%3E");
+        background-repeat: repeat;
+        background-attachment: fixed;
+    }
+    
+    .stApp > header {
+        background-color: transparent !important;
+    }
+    
+    .main {
+        background: transparent !important;
+    }
+    
     .main .block-container {
         padding-top: 1.5rem;
         padding-bottom: 3rem;
