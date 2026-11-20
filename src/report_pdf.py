@@ -67,14 +67,11 @@ def generate_pdf_report(user_img: Image.Image, heatmap_img: Image.Image, info: d
 
     story = []
 
-    # 1. Header Banner
     story.append(Paragraph("🌿 CropShield — Crop Disease Advisory Report", title_style))
     date_str = datetime.now().strftime("%d %B %Y, %I:%M %p")
     story.append(Paragraph(f"<b>Generated on:</b> {date_str} &nbsp;|&nbsp; <b>Model:</b> ResNet18 Field-Adapted + LeafDetector", subtitle_style))
     story.append(Spacer(1, 4))
 
-    # 2. Images Table (Original Photo + Grad-CAM Heatmap)
-    # Save images to in-memory buffers for ReportLab
     img_buf = io.BytesIO()
     user_img.resize((180, 180)).save(img_buf, format="JPEG")
     img_buf.seek(0)
@@ -85,7 +82,6 @@ def generate_pdf_report(user_img: Image.Image, heatmap_img: Image.Image, info: d
     heat_buf.seek(0)
     rl_heat = RLImage(heat_buf, width=150, height=150)
 
-    # Diagnosis Summary Text Box
     diag_text = (
         f"<b>Detected Disease:</b> <font color='#1b5e20' size='11'><b>{info.get('name', 'N/A')}</b></font><br/><br/>"
         f"<b>Confidence:</b> {conf:.1%}<br/>"
@@ -115,7 +111,6 @@ def generate_pdf_report(user_img: Image.Image, heatmap_img: Image.Image, info: d
     story.append(img_table)
     story.append(Spacer(1, 10))
 
-    # 3. Pathogen Cause & Symptoms
     story.append(Paragraph("1. Cause & Biological Origin", section_heading))
     story.append(Paragraph(info.get('cause', 'N/A'), body_style))
     story.append(Spacer(1, 4))
@@ -124,19 +119,16 @@ def generate_pdf_report(user_img: Image.Image, heatmap_img: Image.Image, info: d
     story.append(Paragraph(info.get('symptoms', 'N/A'), body_style))
     story.append(Spacer(1, 4))
 
-    # 4. Immediate Treatment Actions
     story.append(Paragraph("3. Recommended Management & Chemical/Organic Actions", section_heading))
     for step in info.get('treatment', []):
         story.append(Paragraph(f"• {step}", bullet_style))
     story.append(Spacer(1, 4))
 
-    # 5. Long-term Prevention
     story.append(Paragraph("4. Prevention & Cultural Control Practices", section_heading))
     for step in info.get('prevention', []):
         story.append(Paragraph(f"• {step}", bullet_style))
     story.append(Spacer(1, 8))
 
-    # 6. Local KVK Advisory Contact
     if kvk_info:
         story.append(Paragraph("5. Local Agricultural Support (Krishi Vigyan Kendra)", section_heading))
         kvk_text = (
@@ -155,7 +147,6 @@ def generate_pdf_report(user_img: Image.Image, heatmap_img: Image.Image, info: d
         story.append(kvk_table)
         story.append(Spacer(1, 8))
 
-    # 7. Disclaimer
     story.append(Paragraph(
         "<b>Important Advisory Disclaimer:</b> CropShield is an AI-assisted decision-support system. "
         "Chemical recommendations indicate functional groups only, never exact dosages. Always verify diagnosis with a "

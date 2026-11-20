@@ -1,6 +1,3 @@
-"""
-Generates the comprehensive CropShield Viva & Project Master Guide PDF.
-"""
 import sys
 from pathlib import Path
 from reportlab.lib.pagesizes import letter
@@ -15,7 +12,6 @@ ROOT = Path(__file__).resolve().parent.parent
 PDF_OUT = ROOT / "CropShield_Viva_and_Project_Guide.pdf"
 
 class NumberedCanvas(canvas.Canvas):
-    """Adds page numbers and running header/footer."""
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self._saved_page_states = []
@@ -37,14 +33,12 @@ class NumberedCanvas(canvas.Canvas):
         self.setFont("Helvetica", 8)
         self.setFillColor(colors.HexColor("#666666"))
         
-        # Header (on pages after page 1)
         if self._pageNumber > 1:
             self.drawString(40, 755, "CropShield: Crop Disease & Pest Classifier — Master Project & Viva Guide")
             self.setStrokeColor(colors.HexColor("#CCCCCC"))
             self.setLineWidth(0.5)
             self.line(40, 750, 572, 750)
             
-        # Footer
         page_str = f"Page {self._pageNumber} of {page_count}"
         self.drawRightString(572, 28, page_str)
         self.drawString(40, 28, "Confidential — Academic Presentation & Viva Preparation Document")
@@ -66,7 +60,6 @@ def build_pdf():
 
     styles = getSampleStyleSheet()
 
-    # Custom styles
     title_style = ParagraphStyle(
         'DocTitle',
         parent=styles['Heading1'],
@@ -155,12 +148,10 @@ def build_pdf():
 
     story = []
 
-    # Title Banner
     story.append(Paragraph("🌿 CropShield: Deep Learning Leaf Disease Diagnosis", title_style))
     story.append(Paragraph("<b>End-to-End System Architecture, Machine Learning Theory & Comprehensive Viva Guide</b>", subtitle_style))
     story.append(HRFlowable(width="100%", thickness=2, color=colors.HexColor("#2e7d32"), spaceAfter=12))
 
-    # Section 1: Executive Summary
     story.append(Paragraph("1. Executive Summary & Problem Statement", h1_style))
     story.append(Paragraph(
         "Crop diseases and insect pests cause between <b>20% to 40% of global agricultural yield loss</b> annually. "
@@ -177,7 +168,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 2: Datasets & Explanations
     story.append(Paragraph("2. Datasets Used: The Numbers & Rationale", h1_style))
     story.append(Paragraph(
         "Our project leverages three distinct image datasets to ensure both lab precision and real-world robustness:",
@@ -239,7 +229,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 3: Machine Learning Concepts
     story.append(Paragraph("3. Core Machine Learning Concepts Simplified", h1_style))
 
     story.append(Paragraph("<b>1. What are 'Weights' in a Neural Network?</b>", h2_style))
@@ -271,7 +260,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 4: Models & Architecture
     story.append(Paragraph("4. Model Architectures: How Each Model Works", h1_style))
 
     models_data = [
@@ -312,7 +300,6 @@ def build_pdf():
     story.append(t_models)
     story.append(Spacer(1, 10))
 
-    # Section 5: The Gatekeeper Bouncer Analogy
     story.append(Paragraph("5. The Leaf Gatekeeper: The 'Nightclub Bouncer' Analogy", h1_style))
     story.append(Paragraph(
         "Standard image classification networks use a mathematical function called <b>Softmax</b> in their final layer. "
@@ -333,7 +320,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 6: Results & Evaluation
     story.append(Paragraph("6. Results & Evaluation Metrics", h1_style))
     story.append(Paragraph(
         "<b>Summary on 5,431 Unseen Test Images (PlantVillage):</b>",
@@ -368,7 +354,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 7: Explainable AI: Grad-CAM
     story.append(Paragraph("7. Explainable AI: Grad-CAM Working & Need", h1_style))
     story.append(Paragraph(
         "<b>The Need:</b> Deep learning models are often criticized as 'Black Boxes'. If a model tells a farmer to discard a crop, "
@@ -384,7 +369,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 8: Web Application
     story.append(Paragraph("8. The Web Application Portal (Streamlit)", h1_style))
     story.append(Paragraph(
         "The web application (<code>app/app.py</code>) provides 4 clean, production-ready modules with zero external server dependencies:<br/>"
@@ -398,7 +382,6 @@ def build_pdf():
         body_style
     ))
 
-    # Section 9: Top 10 Viva Questions & Answers
     story.append(Paragraph("9. Top 10 Viva Questions & Winning Answers", h1_style))
 
     viva_qa = [
@@ -428,7 +411,6 @@ def build_pdf():
         story.append(Paragraph(f"<b>{q}</b>", q_style))
         story.append(Paragraph(a, a_style))
 
-    # Build the document
     doc.build(story, canvasmaker=NumberedCanvas)
     print(f"Successfully generated {PDF_OUT}")
 

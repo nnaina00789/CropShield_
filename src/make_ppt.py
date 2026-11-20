@@ -1,4 +1,3 @@
-"""Builds CropShield_Presentation.pptx for class presentation."""
 from pathlib import Path
 from PIL import Image
 from pptx import Presentation
@@ -41,7 +40,6 @@ def bullets(s, x, y, w, h, items, size=20):
 
 
 def picture(s, path, x, y, w, h):
-    """Place image centred in the box, preserving aspect ratio."""
     iw, ih = Image.open(path).size
     k = min(w / iw, h / ih)
     pw, ph = iw * k, ih * k
@@ -71,7 +69,6 @@ def table(s, x, y, w, rows, colw=None, size=15):
             t.columns[j].width = Inches(cw)
 
 
-# 1 Title
 s = prs.slides.add_slide(BLANK)
 rect(s, 0, 0, 13.333, 7.5, DARK)
 rect(s, 0, 4.9, 13.333, 0.08, GREEN)
@@ -80,7 +77,6 @@ text(s, 0.8, 3.4, 11.5, 1, "Crop Disease & Pest Classifier using Deep Learning",
 text(s, 0.8, 5.2, 11.5, 0.6, "Leaf photo  →  Diagnosis  →  Explanation  →  Treatment advice", 20, False, WHITE)
 text(s, 0.8, 6.3, 11.5, 0.5, "Class Presentation", 16, False, RGBColor(0xA5, 0xD6, 0xA7))
 
-# 2 Problem
 s = slide("The Problem")
 bullets(s, 0.7, 1.7, 7.2, 5, [
     "Crop diseases and pests cause major yield losses for farmers every year",
@@ -90,7 +86,6 @@ bullets(s, 0.7, 1.7, 7.2, 5, [
 ], 22)
 picture(s, REP / "samples.png", 8.1, 1.7, 4.8, 5.0)
 
-# 3 Solution overview
 s = slide("Our Solution – 4 Steps")
 steps = [("1. Leaf Check", "Rejects non-leaf photos\n(selfies, objects)"),
          ("2. Classify", "ResNet18 identifies crop + disease\n(38 classes, 14 crops)"),
@@ -104,7 +99,6 @@ for i, (h, d) in enumerate(steps):
     text(s, x + 0.15, 3.3, 2.6, 2, d, 18, False, GREY, PP_ALIGN.CENTER)
 text(s, 0.6, 6.0, 12, 0.6, "Safety built in: 80% confidence threshold + 'consult your local KVK / agriculture officer' disclaimer", 18, True, GREEN)
 
-# 4 Dataset
 s = slide("Datasets Used")
 table(s, 0.7, 1.7, 11.9, [
     ["Dataset", "Type", "Size", "Purpose"],
@@ -117,7 +111,6 @@ bullets(s, 0.7, 4.2, 11.9, 2.8, [
     "Studio images are easy – real fields have shadows, clutter and mixed lighting (domain shift)",
 ], 19)
 
-# 5 Models
 s = slide("Models: Baseline vs Transfer Learning")
 table(s, 0.7, 1.7, 11.9, [
     ["", "SimpleCNN (from scratch)", "ResNet18 (ImageNet pretrained)"],
@@ -130,7 +123,6 @@ table(s, 0.7, 1.7, 11.9, [
 ], [3.2, 4.2, 4.5], 17)
 text(s, 0.7, 5.7, 11.9, 1, "Transfer learning gives ~14× fewer errors with fewer epochs – pretrained features already know edges, textures and shapes.", 19, True, GREEN)
 
-# 6 Confusion matrix
 s = slide("Where Does the Model Make Mistakes?")
 picture(s, REP / "resnet18_confusion_matrix.png", 0.5, 1.4, 6.6, 5.7)
 bullets(s, 7.3, 1.6, 5.6, 5.5, [
@@ -140,7 +132,6 @@ bullets(s, 7.3, 1.6, 5.6, 5.5, [
     "Some errors come from bad dataset images (e.g. 'Cherry healthy' showing grass)",
 ], 18)
 
-# 7 Grad-CAM
 s = slide("Explainability: Grad-CAM")
 picture(s, REP / "gradcam_correct.png", 0.5, 1.4, 7.4, 5.7)
 bullets(s, 8.1, 1.6, 4.9, 5.5, [
@@ -150,7 +141,6 @@ bullets(s, 8.1, 1.6, 4.9, 5.5, [
     "Builds trust: shows the model uses disease features, not the background",
 ], 18)
 
-# 8 Field gap
 s = slide("Lab vs Real Field: Closing the Gap")
 table(s, 0.7, 1.7, 11.9, [
     ["PlantDoc field test (238 images)", "SimpleCNN", "ResNet18 (lab-only)", "ResNet18 (field-adapted)"],
@@ -165,7 +155,6 @@ bullets(s, 0.7, 4.5, 11.9, 2.5, [
     "Result: +41 percentage points on field data with only −1.2 pp on lab data",
 ], 20)
 
-# 9 Leaf detector
 s = slide("'Not a Leaf' Detector")
 table(s, 0.7, 1.7, 11.9, [
     ["Metric (739 unseen images)", "Naive 80% confidence gate", "Dedicated LeafDetector"],
@@ -179,7 +168,6 @@ bullets(s, 0.7, 4.5, 11.9, 2.5, [
     "Solution: frozen ImageNet ResNet18 backbone + logistic regression head (only 4 KB), ROC-AUC 0.9998",
 ], 20)
 
-# 10 Web app
 s = slide("The CropShield Web App (Streamlit)")
 pages = [("🌾 Indian Agriculture", "Vector map of India: farming belts, regions and their crops"),
          ("🩺 Leaf Diagnosis", "Upload / camera photo → prediction, confidence, Grad-CAM, remedies"),
@@ -196,7 +184,6 @@ for i, p in enumerate(imgs):
     if p.exists():
         picture(s, p, 0.8 + i * 3.1, 5.4, 2.8, 1.7)
 
-# 11 Limitations
 s = slide("Limitations & Future Work")
 bullets(s, 0.7, 1.7, 6, 5, [
     "Field accuracy (61% top-1) is still well below studio accuracy",
@@ -213,7 +200,6 @@ bullets(s, 7.0, 1.7, 5.8, 5, [
 text(s, 0.7, 1.3, 6, 0.4, "Limitations", 16, True, GREEN)
 text(s, 7.0, 1.3, 6, 0.4, "Future Work", 16, True, GREEN)
 
-# 12 Conclusion
 s = prs.slides.add_slide(BLANK)
 rect(s, 0, 0, 13.333, 7.5, DARK)
 text(s, 0.8, 0.8, 11.5, 1, "Conclusion", 44, True, WHITE)

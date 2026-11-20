@@ -1,9 +1,3 @@
-"""
-Deploy CropShield to Hugging Face Spaces (Streamlit or Docker Space).
-
-Usage:
-    .venv\\Scripts\\python.exe src\\deploy_hf.py --token <HF_WRITE_TOKEN> [--space <username/CropShield>]
-"""
 import argparse
 import os
 from pathlib import Path

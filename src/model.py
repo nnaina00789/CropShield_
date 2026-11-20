@@ -25,8 +25,8 @@ class SimpleCNN(nn.Module):
         return self.classifier(x)
 
 def build_resnet18(num_classes=38):
-    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)  # pretrained on ImageNet
-    model.fc = nn.Linear(model.fc.in_features, num_classes)                 # new last layer: 512 -> 38
+    model = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
+    model.fc = nn.Linear(model.fc.in_features, num_classes)
     return model
 
 if __name__ == "__main__":

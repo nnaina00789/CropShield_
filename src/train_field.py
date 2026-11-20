@@ -17,7 +17,6 @@ from eval_plantdoc import load_plantdoc_split, evaluate_plantdoc
 CKPT_OUT = Path("checkpoints/resnet18_field.pt")
 OUT = Path("reports"); OUT.mkdir(exist_ok=True)
 
-# Stronger field-style data augmentation: wide scale/aspect crops, lighting/colour jitter, perspective, blur, and random erasing (occlusion)
 field_train_tf = transforms.Compose([
     transforms.RandomResizedCrop(224, scale=(0.45, 1.0), ratio=(0.75, 1.33)),
     transforms.RandomHorizontalFlip(),
@@ -47,11 +46,6 @@ class ImageTableDataset(Dataset):
 
 
 def build_mixed_train_loader(batch_size=32, num_workers=0, pv_per_class=100, pd_repeat=2):
-    """
-    Combines a balanced subset of PlantVillage train (up to pv_per_class per class, ~3,800 images)
-    with oversampled PlantDoc train (2,337 * pd_repeat = ~4,674 images).
-    STRICT RULE: PlantDoc test images are NEVER loaded here.
-    """
     pv_train = pd.read_csv(SPLITS / "train.csv")
     parts = [
         g.sample(min(len(g), pv_per_class), random_state=42)
@@ -61,7 +55,6 @@ def build_mixed_train_loader(batch_size=32, num_workers=0, pv_per_class=100, pd_
     pv_paths = [PV_ROOT / p for p in pv_sub["path"]]
     pv_indices = [CLASS_TO_IDX[c] for c in pv_sub["label"]]
 
-    # Load ONLY PlantDoc's "train" folder
     pd_train_df = load_plantdoc_split("train")
     pd_paths = list(pd_train_df["path"]) * pd_repeat
     pd_indices = list(pd_train_df["idx"]) * pd_repeat
@@ -88,13 +81,12 @@ def main():
     device = "cuda" if torch.cuda.is_available() else "cpu"
     epochs = 6
 
-    # Start from our PlantVillage-trained ResNet18 checkpoint
     model = build_resnet18().to(device)
     model.load_state_dict(torch.load("checkpoints/resnet18.pt", map_location=device))
 
     train_loader = build_mixed_train_loader(batch_size=32, num_workers=0, pv_per_class=100, pd_repeat=2)
     _, val_loader, pv_test_loader = get_loaders(batch_size=64, num_workers=0)
-    pd_test_df = load_plantdoc_split("test")  # used strictly for final reporting
+    pd_test_df = load_plantdoc_split("test")
 
     loss_fn = nn.CrossEntropyLoss(label_smoothing=0.05)
     optimizer = torch.optim.AdamW(model.parameters(), lr=1.5e-4, weight_decay=1e-4)
@@ -126,7 +118,6 @@ def main():
     torch.save(model.state_dict(), CKPT_OUT)
     print(f"\nSaved fine-tuned field checkpoint to {CKPT_OUT}")
 
-    # Evaluate AFTER fine-tuning on both PlantDoc test (238 images) and PlantVillage test (5,431 images)
     y_true_pd, y_pred_pd, y_top3_pd, confs_pd = evaluate_plantdoc(model, pd_test_df, device)
     pd_acc_after = (y_true_pd == y_pred_pd).mean()
     pd_top3_after = y_top3_pd.mean()
@@ -135,7 +126,6 @@ def main():
 
     pv_acc_after, pv_wrong_after = evaluate_pv_test(model, pv_test_loader, device)
 
-    # Compare BEFORE vs AFTER
     pv_acc_before, pv_wrong_before = 0.9969, 17
     pd_acc_before, pd_top3_before, pd_crop_before = 0.2017, 0.4328, 0.4664
 
@@ -160,7 +150,6 @@ def main():
     )
     (OUT / "resnet18_field_comparison.txt").write_text(comparison + "\nPlantDoc Test Classification Report (After):\n" + pd_report, encoding="utf-8")
 
-    # Save predictions CSV
     out_df = pd_test_df.copy()
     out_df["path"] = out_df["path"].apply(lambda p: p.as_posix())
     out_df["predicted"] = [CLASSES[i] for i in y_pred_pd]
@@ -168,7 +157,6 @@ def main():
     out_df["correct"] = y_true_pd == y_pred_pd
     out_df.to_csv(OUT / "resnet18_field_plantdoc_test_predictions.csv", index=False)
 
-    # Plot Before vs After comparison bar chart
     fig, ax = plt.subplots(figsize=(8.5, 5.2))
     metrics = ["PlantDoc Top-1\n(Field)", "PlantDoc Top-3\n(Field)", "PlantDoc Crop-Level\n(Field)", "PlantVillage Top-1\n(Lab)"]
     before_vals = [pd_acc_before * 100, pd_top3_before * 100, pd_crop_before * 100, pv_acc_before * 100]

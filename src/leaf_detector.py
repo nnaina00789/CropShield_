@@ -24,12 +24,10 @@ OUT = Path("reports"); OUT.mkdir(exist_ok=True)
 
 
 class LeafDetector(nn.Module):
-    """Binary gatekeeper (1 = plant leaf, 0 = not a leaf) on frozen ImageNet ResNet18 features."""
-
     def __init__(self, threshold=0.50):
         super().__init__()
         backbone = models.resnet18(weights=models.ResNet18_Weights.IMAGENET1K_V1)
-        backbone.fc = nn.Identity()  # 512-d global average pooled embedding
+        backbone.fc = nn.Identity()
         self.backbone = backbone.eval()
         for p in self.backbone.parameters():
             p.requires_grad = False
@@ -38,7 +36,7 @@ class LeafDetector(nn.Module):
 
     def train(self, mode=True):
         super().train(mode)
-        self.backbone.eval()  # keep ImageNet BatchNorm statistics frozen
+        self.backbone.eval()
         return self
 
     @torch.no_grad()
@@ -52,7 +50,6 @@ class LeafDetector(nn.Module):
 
     @torch.no_grad()
     def predict(self, x):
-        """Given a preprocessed tensor batch x (1, 3, 224, 224), returns (is_leaf, leaf_prob)."""
         self.eval()
         feat = self.backbone(x)
         prob = torch.sigmoid(self.head(feat))[0, 0].item()
@@ -74,7 +71,6 @@ def main():
 
     detector = LeafDetector().to(device)
 
-    # 1. Gather training paths (ONLY from train splits, never test splits)
     pv_train_df = pd.read_csv("splits/train.csv").sample(500, random_state=42)
     pv_train_paths = [PV_ROOT / p for p in pv_train_df["path"]]
 
@@ -88,7 +84,6 @@ def main():
     nl_train_paths = non_leaf_all[:200]
     nl_test_paths = non_leaf_all[200:]
 
-    # 2. Gather held-out test paths
     pv_test_df = pd.read_csv("splits/test.csv").sample(300, random_state=42)
     pv_test_paths = [PV_ROOT / p for p in pv_test_df["path"]]
 
@@ -106,14 +101,12 @@ def main():
     X_pd_te = detector.extract_features(pd_test_paths, device)
     X_nl_te = detector.extract_features(nl_test_paths, device)
 
-    # 3. Fit L2-regularized logistic regression head
     X_tr = np.vstack([X_pv_tr, X_pd_tr, X_nl_tr])
     y_tr = np.array([1] * (len(X_pv_tr) + len(X_pd_tr)) + [0] * len(X_nl_tr))
 
     clf = LogisticRegression(max_iter=1000, C=0.1, class_weight="balanced", random_state=42)
     clf.fit(X_tr, y_tr)
 
-    # Copy trained weights into PyTorch linear head and save lightweight checkpoint (~2 KB)
     with torch.no_grad():
         detector.head.weight.copy_(torch.from_numpy(clf.coef_.astype(np.float32)))
         detector.head.bias.copy_(torch.from_numpy(clf.intercept_.astype(np.float32)))
@@ -121,7 +114,6 @@ def main():
     torch.save(detector.head.state_dict(), CKPT_PATH)
     print(f"Saved leaf detector head weights to {CKPT_PATH} ({CKPT_PATH.stat().st_size:,} bytes)\n")
 
-    # 4. Evaluate on held-out test sets
     X_te = np.vstack([X_pv_te, X_pd_te, X_nl_te])
     y_te = np.array([1] * (len(X_pv_te) + len(X_pd_te)) + [0] * len(X_nl_te))
     probs_te = clf.predict_proba(X_te)[:, 1]
@@ -138,7 +130,6 @@ def main():
     pd_acc = (pd_probs >= 0.50).mean()
     nl_acc = (nl_probs < 0.50).mean()
 
-    # Compare against the naive 80%-confidence threshold on the 38-class disease ResNet18
     from model import build_resnet18
     disease_model = build_resnet18().to(device).eval()
     disease_model.load_state_dict(torch.load("checkpoints/resnet18.pt", map_location=device))
@@ -183,7 +174,6 @@ def main():
     print(summary)
     (OUT / "leaf_detector_report.txt").write_text(summary, encoding="utf-8")
 
-    # 5. Plot ROC curve + probability distribution histogram
     fig, axes = plt.subplots(1, 2, figsize=(12, 4.8))
     fpr, tpr, _ = roc_curve(y_te, probs_te)
     axes[0].plot(fpr, tpr, color="#2e7d32", lw=2.5, label=f"LeafDetector (AUC = {auc:.4f})")

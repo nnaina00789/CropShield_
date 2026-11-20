@@ -32,21 +32,18 @@ EXCLUDE_PATTERNS = [
 
 print(f"Creating project ZIP archive at: {ZIP_OUT}")
 with zipfile.ZipFile(ZIP_OUT, 'w', zipfile.ZIP_DEFLATED) as zipf:
-    # Add explicit root files
     for fname in INCLUDE_FILES:
         fpath = ROOT / fname
         if fpath.exists():
             zipf.write(fpath, arcname=f"CropShield/{fname}")
             print(f"Added file: {fname}")
 
-    # Add directories
     for dname in INCLUDE_DIRS:
         dpath = ROOT / dname
         if not dpath.exists():
             continue
         for file in dpath.rglob("*"):
             if file.is_file():
-                # Check exclusions
                 if any(part in file.parts for part in ["__pycache__", ".git", ".venv", ".pytest_cache"]):
                     continue
                 if file.suffix in [".pyc", ".pyo"]:

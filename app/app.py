@@ -28,7 +28,6 @@ st.set_page_config(
     initial_sidebar_state="expanded"
 )
 
-# Custom High-Contrast, Professional Theme-Adaptive CSS
 st.markdown("""
 <style>
     /* Card Container */
@@ -192,7 +191,6 @@ UI = {
     }
 }
 
-# Agro-climatic regions database for India
 AGRO_REGIONS = {
     "🍎 Himalayan Temperate Zone (North)": {
         "short_name": "🍎 Himalayan Belt",
@@ -240,7 +238,6 @@ AGRO_REGIONS = {
     }
 }
 
-# Detailed Crop Catalog for all 14 species supported in CropShield
 CROP_CATALOG = {
     "Tomato": {
         "hindi": "टमाटर",
@@ -377,7 +374,6 @@ def overlay(img, heat):
     return 0.55 * base + 0.45 * colored
 
 def get_standardized_image(image_or_path, size=(240, 240)):
-    """Crops and standardizes image to exact uniform square dimensions."""
     from PIL import ImageOps
     if image_or_path is None:
         return None
@@ -530,7 +526,6 @@ def get_india_svg(selected_region: str) -> str:
 
 detector, gradcam, all_remedies, kvk_directory = load_assets()
 
-# Sidebar: Language & Navigation
 with st.sidebar:
     st.markdown("### 🌿 CropShield Navigation")
     
@@ -549,7 +544,6 @@ with st.sidebar:
     st.markdown("#### 🌾 National Farmer Helpline")
     st.info("📞 **1800-180-1551**\n\nToll-Free Kisan Call Center • Available in 22 Regional Languages (6 AM – 10 PM)")
 
-# Header Section
 st.markdown(f"""
 <div class="cs-hero">
     <div class="cs-title">{t['title']}</div>
@@ -558,9 +552,6 @@ st.markdown(f"""
 """, unsafe_allow_html=True)
 
 
-# ==========================================
-# PAGE 0: INTRO - INDIAN FARMING EXPLORER
-# ==========================================
 if page == t["nav_overview"]:
     st.subheader("🗺️ Agro-Climatic Regions & Crop Farming Systems of India")
     st.write(
@@ -568,7 +559,6 @@ if page == t["nav_overview"]:
         "are cultivated, seasonal threats evolve, and simulate disease outbreaks across India's premier farming belts."
     )
 
-    # 1. Real-Time Agricultural Pulse Metrics
     st.markdown("#### 📡 National Agricultural Situation & System Overview")
     col_m1, col_m2, col_m3, col_m4 = st.columns(4)
     with col_m1:
@@ -602,7 +592,6 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # 2. Cropping Seasons Matrix (Kharif, Rabi, Zaid)
     st.markdown("#### 🌦️ Cropping Seasons of India (Kharif, Rabi, Zaid)")
     st.caption("Select a cropping season to inspect how temperature, monsoon rainfall, and pathogen risks shift throughout the year:")
 
@@ -656,14 +645,11 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # 3. Regional Agro-Climatic Belts & Focused Map of India
     st.markdown("#### 🗺️ Regional Agro-Climatic Belts of India")
     
-    # Session state for belt selection (click map or button)
     if "selected_region" not in st.session_state or st.session_state["selected_region"] not in AGRO_REGIONS:
         st.session_state["selected_region"] = list(AGRO_REGIONS.keys())[1]
 
-    # Quick Selection Buttons for Farming Belts
     st.markdown("📍 **Select Agricultural Belt to Highlight on the Map of India:**")
     b_cols = st.columns(4)
     for i, (r_key, r_val) in enumerate(AGRO_REGIONS.items()):
@@ -705,7 +691,6 @@ if page == t["nav_overview"]:
 
     st.markdown("---")
 
-    # Clean Call to Action to Diagnosis and Pathology
     cta_col1, cta_col2 = st.columns([1.5, 1.5], gap="medium")
     with cta_col1:
         st.markdown("""
@@ -725,11 +710,7 @@ if page == t["nav_overview"]:
         """, unsafe_allow_html=True)
 
 
-# ==========================================
-# PAGE 1: DIAGNOSIS & TREATMENT (CORE APP)
-# ==========================================
 elif page == t["nav_diagnose"]:
-    # 1. Intuitive 3-Step Workflow Banner (Clean, Practical, Symmetrical)
     col_s1, col_s2, col_s3 = st.columns(3)
     with col_s1:
         st.markdown(f"""
@@ -755,7 +736,6 @@ elif page == t["nav_diagnose"]:
 
     st.markdown("<br/>", unsafe_allow_html=True)
 
-    # 2. How to Test Expander (Clean, out of the way, but easily accessible)
     with st.expander(t["test_guide_title"], expanded=False):
         st.markdown(f"""
         {t['test_guide_1']}  
@@ -763,7 +743,6 @@ elif page == t["nav_diagnose"]:
         {t['test_guide_3']}  
         """)
 
-    # 3. Symmetrical, Centered Upload & Capture Area
     _, center_col, _ = st.columns([0.2, 0.6, 0.2])
     with center_col:
         mode = st.radio(
@@ -777,13 +756,11 @@ elif page == t["nav_diagnose"]:
         else:
             file = st.camera_input(t["camera_label"])
 
-    # 4. Diagnostic Results (Perfect 50/50 Symmetrical Layout)
     if file:
         img = Image.open(file).convert("RGB")
         x = eval_tf(img).unsqueeze(0).to(DEVICE)
         is_leaf, leaf_prob = detector.predict(x)
 
-        # Gatekeeper Check
         if not is_leaf:
             st.error(t["not_a_leaf"].format(leaf_prob=leaf_prob))
             c_err, _ = st.columns([1, 2])
@@ -794,7 +771,6 @@ elif page == t["nav_diagnose"]:
             info = remedies[raw_class]
             crop_name = raw_class.split("___")[0]
 
-            # Confidence Threshold
             if conf < THRESHOLD:
                 st.warning(t["not_sure"].format(conf=conf))
                 c_warn, _ = st.columns([1, 2])
@@ -802,7 +778,6 @@ elif page == t["nav_diagnose"]:
             else:
                 st.markdown("---")
                 
-                # Prominent Result Callout
                 st.markdown(f"""
                 <div class="cs-result-banner">
                     <div style="font-size:0.85rem; text-transform:uppercase; letter-spacing:1px; color:#2e7d32; font-weight:700;">Diagnostic Result</div>
@@ -810,11 +785,9 @@ elif page == t["nav_diagnose"]:
                 </div>
                 """, unsafe_allow_html=True)
 
-                # Equal 50/50 Symmetrical Split
                 res_left, res_right = st.columns([1, 1], gap="large")
 
                 with res_left:
-                    # Key Metrics
                     sub_m1, sub_m2 = st.columns(2)
                     sub_m1.metric(t["conf_label"], f"{conf:.1%}")
                     sub_m2.metric(t["type_label"], info["type"].title())
@@ -822,13 +795,11 @@ elif page == t["nav_diagnose"]:
                     if raw_class.endswith("___healthy"):
                         st.success(t["healthy_msg"])
 
-                    # Symmetrical Side-by-Side Images
                     i1, i2 = st.columns(2)
                     i1.image(img.resize((224, 224)), caption=t["your_photo"], use_container_width=True)
                     heatmap_overlay_img = Image.fromarray((overlay(img, heat) * 255).astype(np.uint8))
                     i2.image(heatmap_overlay_img, caption=t["heatmap"], use_container_width=True)
 
-                    # Top-3 Predictions Bar
                     st.markdown(f"**{t['top3']}**")
                     top3_idx = np.argsort(probs)[::-1][:3]
                     top3_list = []
@@ -839,7 +810,6 @@ elif page == t["nav_diagnose"]:
                         st.progress(p, text=f"{rank}. {cls_name} — {p:.1%}")
 
                     st.markdown("<br/>", unsafe_allow_html=True)
-                    # PDF Report Button
                     try:
                         pdf_bytes = generate_pdf_report(
                             user_img=img,
@@ -860,7 +830,6 @@ elif page == t["nav_diagnose"]:
                         st.caption(f"PDF generator notice: {e}")
 
                 with res_right:
-                    # Clean Tabs for Actionable Advice
                     tab_rx, tab_diag, tab_prev = st.tabs([
                         f"💊 {t['treatment']}",
                         f"🔬 {t['symptoms']}",
@@ -883,7 +852,6 @@ elif page == t["nav_diagnose"]:
                         for s in info["prevention"]:
                             st.markdown(f"- **{s}**")
 
-                    # Healthy Reference Comparison Card
                     healthy_ref_img = get_healthy_reference_image(crop_name)
                     if healthy_ref_img and not raw_class.endswith("___healthy"):
                         with st.expander(t["ref_heading"], expanded=False):
@@ -894,9 +862,6 @@ elif page == t["nav_diagnose"]:
                 st.caption(t["disclaimer"])
 
 
-# ==========================================
-# PAGE 2: CROP PATHOLOGY & OUTBREAK SIMULATOR
-# ==========================================
 elif page == t["nav_crops"]:
     st.subheader("🔬 Crop Pathology, Outbreak Simulator & 38-Disease Library")
     st.write(
@@ -904,7 +869,6 @@ elif page == t["nav_crops"]:
         "and complete pathological profiles across all 14 crop species and 38 conditions recognized by CropShield:"
     )
 
-    # 1. Micro-Climate Disease Outbreak Simulator (Real-Time Pathology Predictor)
     st.markdown("#### 🌡️ Real-Time Micro-Climate Outbreak Simulator")
     st.write(
         "Foliar pathogens (fungal spores, bacteria, and viral vectors) require specific micro-climatic thresholds to germinate and infect. "
@@ -993,7 +957,6 @@ elif page == t["nav_crops"]:
                 alert_level = "MODERATE"
                 action_advice = "High moisture creates potential for fungal germination. Monitor leaf margins."
 
-        # Display Result Gauge
         if alert_level == "CRITICAL":
             st.error(f"🚨 **Calculated Outbreak Risk: {risk_score}% — CRITICAL ALERT**")
         elif alert_level == "MODERATE":
@@ -1007,7 +970,6 @@ elif page == t["nav_crops"]:
 
     st.markdown("---")
 
-    # 2. 14-Crop Agronomy & Certified Leaf Profiles
     st.markdown("#### 🌿 Crop Profile & Certified Leaf Baseline")
     inspect_crop = st.selectbox(
         "Choose Crop to Inspect:",
@@ -1036,15 +998,12 @@ elif page == t["nav_crops"]:
 
     st.markdown("---")
 
-    # 3. Pathological Conditions Library for Selected Crop
     st.markdown(f"#### 🛡️ Pathological Conditions Screened for {inspect_crop.replace('_', ' ')}")
     st.caption("Standardized uniform visual samples, biological classification, foliar symptoms, and cultural actions for each condition:")
     
-    # Collect standard classes for this crop (handling Cherry's benchmark naming)
     prefix = "Cherry_(including_sour)___" if inspect_crop == "Cherry" else f"{inspect_crop}___"
     crop_classes = [c for c in CLASSES if c.startswith(prefix)]
     
-    # Also collect any extended condition for this crop (Orange, Squash, Soybean, Blueberry, Raspberry)
     ext_classes = [k for k in EXTENDED_PATHOLOGY if k.startswith(f"{inspect_crop}___") and k not in crop_classes]
     all_display_classes = crop_classes + ext_classes
 
@@ -1062,7 +1021,6 @@ elif page == t["nav_crops"]:
                     if not sample_img_path.exists():
                         sample_img_path = Path("demo_images") / "Cherry_(including_sour)___healthy.jpg"
             
-            # Standardized exact 240x240 image
             fitted_img = get_standardized_image(sample_img_path, (240, 240))
             if fitted_img:
                 st.image(fitted_img, caption=f"🔬 {info['name']}", use_container_width=True)
@@ -1080,9 +1038,6 @@ elif page == t["nav_crops"]:
             """, unsafe_allow_html=True)
 
 
-# ==========================================
-# PAGE 3: KVK DIRECTORY & HELPLINES
-# ==========================================
 elif page == t["nav_kvk"]:
     st.subheader("🏛️ Krishi Vigyan Kendra (KVK) Directory & Farmer Helplines")
     st.write("Direct agricultural assistance centers and toll-free advisory numbers by state:")

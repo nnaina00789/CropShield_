@@ -6,7 +6,7 @@ from torchvision import transforms
 
 ROOT = Path("data/raw/plantvillage dataset/color")
 SPLITS = Path("splits")
-MEAN, STD = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]  # ImageNet statistics
+MEAN, STD = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
 
 train_tf = transforms.Compose([
     transforms.RandomResizedCrop(224, scale=(0.8, 1.0)),

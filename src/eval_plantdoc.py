@@ -12,7 +12,6 @@ from model import SimpleCNN, build_resnet18
 PLANTDOC_ROOT = Path("data/raw/PlantDoc-Dataset")
 OUT = Path("reports"); OUT.mkdir(exist_ok=True)
 
-# Exact 1-to-1 mapping from PlantDoc's 28 folder names to PlantVillage's 38 class names
 PLANTDOC_TO_PV = {
     "Apple Scab Leaf":                      "Apple___Apple_scab",
     "Apple leaf":                           "Apple___healthy",
@@ -111,7 +110,6 @@ def main():
     tag = f"{ckpt_name}_plantdoc_{split}"
     (OUT / f"{tag}_report.txt").write_text(summary + "\n" + report, encoding="utf-8")
 
-    # Save predictions CSV
     out_df = df.copy()
     out_df["path"] = out_df["path"].apply(lambda p: p.relative_to(PLANTDOC_ROOT).as_posix())
     out_df["predicted"] = [CLASSES[i] for i in y_pred]
@@ -119,7 +117,6 @@ def main():
     out_df["correct"] = y_true == y_pred
     out_df.to_csv(OUT / f"{tag}_predictions.csv", index=False)
 
-    # Save side-by-side comparison bar chart for test split
     if split == "test" and ckpt_name == "resnet18":
         per_cls = out_df.groupby("label")["correct"].agg(["count", "mean"]).sort_values("mean")
         fig, ax = plt.subplots(figsize=(10, 8))
