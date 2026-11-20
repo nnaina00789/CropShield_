@@ -208,6 +208,172 @@ st.markdown("""
     
     section[data-testid="stSidebar"] {
         border-right: 1px solid rgba(128, 128, 128, 0.14) !important;
+        background-color: var(--secondary-background-color) !important;
+    }
+    
+    .sidebar-brand-card {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        padding: 14px 16px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.03) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.22);
+        border-radius: 16px;
+        margin-bottom: 18px;
+    }
+    
+    .sidebar-brand-icon {
+        font-size: 1.5rem;
+        line-height: 1;
+    }
+    
+    .sidebar-brand-name {
+        font-size: 1.12rem;
+        font-weight: 800;
+        color: #059669;
+        letter-spacing: -0.4px;
+        line-height: 1.2;
+    }
+    
+    .sidebar-brand-status {
+        font-size: 0.72rem;
+        font-weight: 600;
+        color: var(--text-color);
+        opacity: 0.75;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        margin-top: 2px;
+    }
+    
+    .sidebar-pulse-dot {
+        width: 6px;
+        height: 6px;
+        border-radius: 9999px;
+        background-color: #10b981;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
+        display: inline-block;
+    }
+    
+    .sidebar-section-label {
+        font-size: 0.72rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.08em;
+        color: var(--text-color);
+        opacity: 0.6;
+        margin: 18px 0 8px 2px;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stRadio"]:first-of-type > div[role="radiogroup"] {
+        display: flex;
+        flex-direction: row;
+        background: rgba(128, 128, 128, 0.08);
+        padding: 3px;
+        border-radius: 9999px;
+        border: 1px solid rgba(128, 128, 128, 0.12);
+        gap: 2px;
+        margin-bottom: 12px;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stRadio"]:first-of-type > div[role="radiogroup"] > label {
+        flex: 1;
+        text-align: center;
+        border-radius: 9999px;
+        padding: 6px 8px;
+        font-size: 0.8rem;
+        font-weight: 600;
+        margin: 0;
+        border: none;
+        background: transparent;
+        justify-content: center;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stRadio"]:first-of-type > div[role="radiogroup"] > label:hover {
+        background: rgba(16, 185, 129, 0.12);
+        color: #059669;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] {
+        gap: 6px;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label {
+        background-color: rgba(128, 128, 128, 0.04);
+        border: 1px solid rgba(128, 128, 128, 0.1);
+        border-radius: 12px;
+        padding: 10px 14px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+        margin-bottom: 2px;
+    }
+    
+    section[data-testid="stSidebar"] div[data-testid="stRadio"] > div[role="radiogroup"] > label:hover {
+        background-color: rgba(16, 185, 129, 0.08);
+        border-color: rgba(16, 185, 129, 0.3);
+        transform: translateX(2px);
+    }
+    
+    .sidebar-help-card {
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.06) 0%, rgba(5, 150, 105, 0.02) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.2);
+        border-radius: 16px;
+        padding: 16px;
+        margin-top: 14px;
+    }
+    
+    .sidebar-help-header {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-size: 0.82rem;
+        font-weight: 700;
+        color: #059669;
+        margin-bottom: 6px;
+    }
+    
+    .sidebar-help-phone {
+        font-size: 1.22rem;
+        font-weight: 800;
+        letter-spacing: 0.5px;
+        color: var(--text-color);
+        margin-bottom: 4px;
+    }
+    
+    .sidebar-help-subtitle {
+        font-size: 0.74rem;
+        line-height: 1.4;
+        color: var(--text-color);
+        opacity: 0.75;
+    }
+    
+    .sidebar-stats-card {
+        background: rgba(128, 128, 128, 0.04);
+        border: 1px solid rgba(128, 128, 128, 0.1);
+        border-radius: 14px;
+        padding: 12px 14px;
+        margin-top: 14px;
+    }
+    
+    .sidebar-stat-row {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        font-size: 0.72rem;
+        color: var(--text-color);
+        opacity: 0.8;
+        padding: 4px 0;
+        border-bottom: 1px solid rgba(128, 128, 128, 0.07);
+    }
+    
+    .sidebar-stat-row:last-child {
+        border-bottom: none;
+    }
+    
+    .sidebar-stat-row strong {
+        font-family: 'JetBrains Mono', monospace;
+        font-weight: 600;
+        color: #059669;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -924,18 +1090,60 @@ with st.sidebar:
     t = UI[lang]
     remedies = all_remedies[lang]
     
-    st.markdown(f"### {t['sidebar_nav']}")
+    brand_sub = "v2.4 इंजन सक्रिय" if is_hindi else "v2.4 Engine Active"
+    st.markdown(f"""
+    <div class="sidebar-brand-card">
+        <div class="sidebar-brand-icon">🌱</div>
+        <div class="sidebar-brand-text">
+            <div class="sidebar-brand-name">CropShield</div>
+            <div class="sidebar-brand-status"><span class="sidebar-pulse-dot"></span> {brand_sub}</div>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
     
-    st.markdown("---")
+    st.markdown(f'<div class="sidebar-section-label">{t["sidebar_nav"]}</div>', unsafe_allow_html=True)
     page = st.radio(
         "Select Portal Section",
         [t["nav_overview"], t["nav_diagnose"], t["nav_crops"], t["nav_kvk"]],
         label_visibility="collapsed"
     )
     
-    st.markdown("---")
-    st.markdown(f"#### {t['sidebar_help_title']}")
-    st.info(t["sidebar_help_desc"])
+    helpline_sub = (
+        "टोल-फ्री किसान कॉल सेंटर • 22 क्षेत्रीय भाषाएँ (सुबह 6 - रात 10)"
+        if is_hindi else
+        "Toll-Free Kisan Call Center • 22 Regional Languages (6 AM – 10 PM)"
+    )
+    st.markdown(f"""
+    <div class="sidebar-help-card">
+        <div class="sidebar-help-header">
+            <span>📞</span>
+            <span>{t['sidebar_help_title']}</span>
+        </div>
+        <div class="sidebar-help-phone">1800-180-1551</div>
+        <div class="sidebar-help-subtitle">{helpline_sub}</div>
+    </div>
+    """, unsafe_allow_html=True)
+    
+    stat_lbl1 = "अनुमान विलंबता" if is_hindi else "Inference Latency"
+    stat_lbl2 = "आर्किटेक्चर" if is_hindi else "Architecture"
+    stat_lbl3 = "गेटकीपर फिल्टर" if is_hindi else "Gatekeeper Filter"
+    stat_val3 = "सक्रिय (0.80)" if is_hindi else "Active (0.80)"
+    st.markdown(f"""
+    <div class="sidebar-stats-card">
+        <div class="sidebar-stat-row">
+            <span>{stat_lbl1}</span>
+            <strong>&lt; 45ms</strong>
+        </div>
+        <div class="sidebar-stat-row">
+            <span>{stat_lbl2}</span>
+            <strong>ResNet18 Dual</strong>
+        </div>
+        <div class="sidebar-stat-row">
+            <span>{stat_lbl3}</span>
+            <strong>{stat_val3}</strong>
+        </div>
+    </div>
+    """, unsafe_allow_html=True)
 
 badge_text = "फसल स्वास्थ्य निदान • 14 मुख्य फसलें" if is_hindi else "Autonomous Foliar Diagnostics • 14 Crop Species"
 st.markdown(f"""
