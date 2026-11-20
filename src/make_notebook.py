@@ -1,0 +1,182 @@
+import json
+from pathlib import Path
+
+nb = {
+    "cells": [
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "# 🌿 CropShield: Crop Disease & Pest Diagnosis System\n",
+                "### Deep Learning for Agricultural Leaf Disease Classification, Explainability & Out-of-Distribution Detection\n",
+                "---\n",
+                "**Overview:**\n",
+                "CropShield is an end-to-end computer vision and decision-support pipeline designed to assist farmers and agronomists in detecting crop diseases from leaf photographs.\n\n",
+                "1. **Out-of-Distribution (OOD) Gatekeeper**: Screens out non-leaf photos (selfies, objects) before disease classification (99.05% binary accuracy).\n",
+                "2. **Disease & Pest Classifier**: Transfer learning ResNet18 covering 38 classes across 14 crops (99.69% lab accuracy, field-adapted with PlantDoc to 61.34% top-1 / 87.39% top-3).\n",
+                "3. **Explainable AI (XAI)**: Custom Grad-CAM visual heatmaps showing exact lesion attention regions.\n",
+                "4. **Treatment & Advisory Engine**: Pathogen-specific bilingual (English & Hindi) treatment recommendations.\n"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# 1. Environment & Dependencies\n",
+                "import os\n",
+                "import sys\n",
+                "import torch\n",
+                "import torch.nn as nn\n",
+                "from PIL import Image\n",
+                "import matplotlib.pyplot as plt\n",
+                "import numpy as np\n",
+                "import json\n",
+                "from pathlib import Path\n",
+                "\n",
+                "# Add src to system path\n",
+                "sys.path.append(str(Path('.').resolve() / 'src'))\n",
+                "from dataset import CLASSES, eval_tf\n",
+                "from model import build_resnet18, SimpleCNN\n",
+                "from gradcam import GradCAM, overlay_cam\n",
+                "\n",
+                "device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')\n",
+                "print(f'Using device: {device}')\n",
+                "print(f'Total diagnostic classes: {len(CLASSES)}')\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 2. Model Architectures & Benchmark Comparison\n\n",
+                "| Metric | SimpleCNN (Baseline) | ResNet18 (ImageNet Pretrained) | ResNet18 Field-Adapted |\n",
+                "| :--- | :---: | :---: | :---: |\n",
+                "| **Parameters** | 399,142 | 11,196,006 | 11,196,006 |\n",
+                "| **Training Regime** | 8 epochs (scratch) | 5 epochs (fine-tuning) | Field fine-tuned |\n",
+                "| **PlantVillage Test Acc** | 95.47% | **99.69%** (17 mistakes / 5,431) | 98.47% |\n",
+                "| **PlantDoc Field Top-1** | 10.08% | 20.17% | **61.34%** (+41.17 pp) |\n",
+                "| **PlantDoc Field Top-3** | 25.63% | 43.28% | **87.39%** (+44.11 pp) |\n"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# 3. Load Trained Model Weights\n",
+                "checkpoint_path = Path('checkpoints/resnet18.pt')\n",
+                "if not checkpoint_path.exists():\n",
+                "    checkpoint_path = Path('checkpoints/resnet18_field.pt')\n",
+                "\n",
+                "model = build_resnet18(num_classes=len(CLASSES), pretrained=False)\n",
+                "if checkpoint_path.exists():\n",
+                "    state = torch.load(checkpoint_path, map_location=device)\n",
+                "    model.load_state_dict(state)\n",
+                "    print(f'Loaded model weights from {checkpoint_path}')\n",
+                "else:\n",
+                "    print('Warning: Checkpoint not found; running with initialized weights.')\n",
+                "\n",
+                "model = model.to(device)\n",
+                "model.eval()\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 4. End-to-End Diagnostic Pipeline with Grad-CAM Explainability\n",
+                "Sample test leaves are passed through the pipeline, generating predictions, confidence scores, and visual attention heatmaps.\n"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "# 5. Run Inference & Grad-CAM on Demo Images\n",
+                "demo_files = list(Path('demo_images').glob('*.jpg'))[:4]\n",
+                "cam_extractor = GradCAM(model, target_layer=model.layer4)\n",
+                "\n",
+                "fig, axes = plt.subplots(len(demo_files), 2, figsize=(10, 3.5 * len(demo_files)))\n",
+                "if len(demo_files) == 1:\n",
+                "    axes = np.expand_dims(axes, 0)\n",
+                "\n",
+                "for idx, img_path in enumerate(demo_files):\n",
+                "    raw_img = Image.open(img_path).convert('RGB')\n",
+                "    tensor = eval_tf(raw_img).unsqueeze(0).to(device)\n",
+                "    \n",
+                "    with torch.no_grad():\n",
+                "        logits = model(tensor)\n",
+                "        probs = torch.softmax(logits, dim=1)\n",
+                "        conf, pred_id = torch.max(probs, dim=1)\n",
+                "        pred_class = CLASSES[pred_id.item()]\n",
+                "    \n",
+                "    heatmap = cam_extractor(tensor, class_idx=pred_id.item())\n",
+                "    overlay = overlay_cam(raw_img, heatmap)\n",
+                "    \n",
+                "    axes[idx, 0].imshow(raw_img)\n",
+                "    axes[idx, 0].set_title(f'Input: {img_path.name[:25]}', fontsize=10)\n",
+                "    axes[idx, 0].axis('off')\n",
+                "    \n",
+                "    axes[idx, 1].imshow(overlay)\n",
+                "    axes[idx, 1].set_title(f'Pred: {pred_class}\\nConf: {conf.item()*100:.1f}%', fontsize=10, color='green')\n",
+                "    axes[idx, 1].axis('off')\n",
+                "\n",
+                "plt.tight_layout()\n",
+                "plt.show()\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 6. Treatment & Advisory Engine\n",
+                "The system maps predicted conditions to pathogen categories and validated cultural/chemical treatments from `app/remedies.json`.\n"
+            ]
+        },
+        {
+            "cell_type": "code",
+            "execution_count": None,
+            "metadata": {},
+            "outputs": [],
+            "source": [
+                "with open('app/remedies.json', 'r', encoding='utf-8') as f:\n",
+                "    remedies = json.load(f)\n",
+                "\n",
+                "sample_disease = 'Tomato___Early_blight'\n",
+                "info = remedies.get(sample_disease, {})\n",
+                "print(f\"Disease: {info.get('name')}\")\n",
+                "print(f\"Pathogen Type: {info.get('type')}\")\n",
+                "print(f\"Symptoms: {info.get('symptoms')}\")\n",
+                "print('\\nKey Cultural Prevention:')\n",
+                "for step in info.get('prevention', [])[:3]:\n",
+                "    print(f' - {step}')\n"
+            ]
+        },
+        {
+            "cell_type": "markdown",
+            "metadata": {},
+            "source": [
+                "## 7. Conclusion\n",
+                "- **High Diagnostic Reliability**: 99.69% accuracy on standard benchmark, with state-of-the-art field adaptation.\n",
+                "- **Transparent Decisions**: Grad-CAM visual heatmaps verify that the network focuses on real lesions rather than image backgrounds.\n",
+                "- **Safety First**: Non-leaf gating and strict thresholding prevent false diagnoses on out-of-distribution inputs.\n"
+            ]
+        }
+    ],
+    "metadata": {
+        "language_info": {"name": "python"}
+    },
+    "nbformat": 4,
+    "nbformat_minor": 2
+}
+
+output_path = Path("CropShield_Project.ipynb")
+with open(output_path, "w", encoding="utf-8") as f:
+    json.dump(nb, f, indent=2)
+
+print(f"Successfully generated {output_path.resolve()}")

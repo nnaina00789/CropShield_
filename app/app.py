@@ -588,7 +588,7 @@ if page == t["nav_overview"]:
     with col_m3:
         st.metric(
             label="🛡️ Diagnostic Pathologies",
-            value="38 States",
+            value="38 Classes",
             delta="Bacterial, Fungal, Viral",
             delta_color="off"
         )

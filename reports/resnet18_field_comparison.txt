@@ -1,5 +1,5 @@
 === Feature 4: Before vs. After Field Fine-Tuning Comparison ===
-Training data used: PlantVillage train subset (7,515 images) + PlantDoc train (2,337 images, 4x oversampled)
+Training data used: PlantVillage train subset (3,800 images, 100/class) + PlantDoc train (2,337 images, 2x oversampled = 4,674 images) = 8,474 images/epoch
 PlantDoc test set (238 images) was NEVER seen during training.
 
 Metric                                 | Before (resnet18.pt)   | After (resnet18_field.pt) | Change      
