@@ -26,32 +26,59 @@ DEVICE = "cuda" if torch.cuda.is_available() else "cpu"
 
 st.markdown("""
 <style>
-    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+    @import url('https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap');
     
     html, body, [class*="css"] {
-        font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+        font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
     
     .main .block-container {
-        padding-top: 1.8rem;
-        padding-bottom: 2.5rem;
+        padding-top: 1.5rem;
+        padding-bottom: 3rem;
         max-width: 1200px;
     }
     
     .cs-hero {
-        background: linear-gradient(135deg, rgba(46, 125, 50, 0.12) 0%, rgba(27, 94, 32, 0.04) 100%);
-        border: 1px solid rgba(46, 125, 50, 0.25);
-        border-radius: 12px;
-        padding: 24px 28px;
-        margin-bottom: 24px;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.08) 0%, rgba(5, 150, 105, 0.02) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.22);
+        border-radius: 20px;
+        padding: 26px 32px;
+        margin-bottom: 26px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+        position: relative;
+        overflow: hidden;
+    }
+    
+    .cs-hero-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 4px 12px;
+        border-radius: 9999px;
+        font-size: 0.75rem;
+        font-weight: 700;
+        background: rgba(16, 185, 129, 0.12);
+        color: #059669;
+        border: 1px solid rgba(16, 185, 129, 0.25);
+        margin-bottom: 12px;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .cs-badge-dot {
+        width: 7px;
+        height: 7px;
+        border-radius: 9999px;
+        background-color: #10b981;
+        box-shadow: 0 0 6px rgba(16, 185, 129, 0.6);
     }
     
     .cs-title {
-        font-size: 2.2rem;
-        font-weight: 700;
-        color: #2e7d32;
+        font-size: 2.3rem;
+        font-weight: 800;
+        color: #059669;
         margin: 0 0 6px 0;
-        letter-spacing: -0.5px;
+        letter-spacing: -0.8px;
     }
     
     .cs-tagline {
@@ -60,63 +87,127 @@ st.markdown("""
         opacity: 0.85;
         margin: 0;
         font-weight: 500;
+        line-height: 1.5;
     }
     
     .step-box {
         background-color: var(--secondary-background-color);
-        border: 1px solid rgba(128, 128, 128, 0.2);
-        border-radius: 10px;
-        padding: 16px;
+        border: 1px solid rgba(128, 128, 128, 0.16);
+        border-radius: 18px;
+        padding: 20px 18px;
         text-align: center;
         height: 100%;
         display: flex;
         flex-direction: column;
         justify-content: center;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        box-shadow: 0 2px 6px rgba(0,0,0,0.02);
+        transition: all 0.2s ease;
+    }
+    
+    .step-box:hover {
+        border-color: rgba(16, 185, 129, 0.35);
+        transform: translateY(-2px);
     }
     
     .step-num {
-        font-size: 1.15rem;
-        font-weight: 700;
-        color: #2e7d32;
-        margin-bottom: 4px;
+        font-size: 1.1rem;
+        font-weight: 800;
+        color: #059669;
+        margin-bottom: 6px;
     }
     
     .step-text {
         font-size: 0.88rem;
         color: var(--text-color);
         opacity: 0.85;
-        line-height: 1.4;
+        line-height: 1.45;
     }
     
     .cs-card {
         background-color: var(--secondary-background-color);
-        border: 1px solid rgba(128, 128, 128, 0.2);
-        border-top: 4px solid #2e7d32;
-        border-radius: 10px;
-        padding: 20px;
-        margin-bottom: 16px;
-        box-shadow: 0 4px 6px rgba(0,0,0,0.03);
+        border: 1px solid rgba(128, 128, 128, 0.16);
+        border-radius: 18px;
+        padding: 22px;
+        margin-bottom: 18px;
+        box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02), 0 8px 24px -8px rgba(0, 0, 0, 0.03);
+        transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    
+    .cs-card:hover {
+        border-color: rgba(16, 185, 129, 0.35);
+        box-shadow: 0 4px 12px rgba(0, 0, 0, 0.04), 0 12px 28px -6px rgba(16, 185, 129, 0.05);
     }
     
     .cs-result-banner {
-        background: linear-gradient(90deg, rgba(46, 125, 50, 0.15) 0%, rgba(46, 125, 50, 0.05) 100%);
-        border-radius: 8px;
-        padding: 14px 20px;
-        margin-bottom: 20px;
-        border-left: 6px solid #2e7d32;
+        background: linear-gradient(135deg, rgba(16, 185, 129, 0.14) 0%, rgba(5, 150, 105, 0.04) 100%);
+        border: 1px solid rgba(16, 185, 129, 0.3);
+        border-radius: 18px;
+        padding: 18px 24px;
+        margin-bottom: 22px;
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
     }
     
     .cs-result-title {
-        font-size: 1.6rem;
-        font-weight: 700;
-        color: #2e7d32;
-        margin: 2px 0 0 0;
+        font-size: 1.7rem;
+        font-weight: 800;
+        color: #059669;
+        margin: 0;
+        letter-spacing: -0.5px;
+    }
+    
+    div[data-testid="stMetric"] {
+        background-color: var(--secondary-background-color) !important;
+        border: 1px solid rgba(128, 128, 128, 0.16) !important;
+        border-radius: 16px !important;
+        padding: 14px 18px !important;
+        box-shadow: 0 1px 3px rgba(0,0,0,0.02) !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    div[data-testid="stMetric"]:hover {
+        border-color: rgba(16, 185, 129, 0.3) !important;
     }
     
     div[data-testid="stMetricValue"] {
-        font-size: 1.8rem !important;
-        font-weight: 700 !important;
+        font-size: 1.85rem !important;
+        font-weight: 800 !important;
+        color: #059669 !important;
+        letter-spacing: -0.5px !important;
+    }
+    
+    div[data-testid="stMetricLabel"] {
+        font-size: 0.85rem !important;
+        font-weight: 600 !important;
+        opacity: 0.85 !important;
+    }
+    
+    div[data-testid="stMetricDelta"] {
+        font-size: 0.78rem !important;
+        font-weight: 600 !important;
+    }
+    
+    button[data-baseweb="tab"] {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        font-size: 0.88rem !important;
+        padding: 8px 18px !important;
+    }
+    
+    img {
+        border-radius: 14px !important;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.04) !important;
+    }
+    
+    .stButton > button {
+        border-radius: 12px !important;
+        font-weight: 600 !important;
+        transition: all 0.2s ease !important;
+    }
+    
+    section[data-testid="stSidebar"] {
+        border-right: 1px solid rgba(128, 128, 128, 0.14) !important;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -809,7 +900,7 @@ def get_india_svg(selected_region: str, is_hindi: bool = False) -> str:
     caption_txt = "भारत का वेक्टर मानचित्र • राज्य-वार भौगोलिक संरचना" if is_hindi else "Vector Map of India • Focused State Geometry"
 
     svg_markup = f"""
-    <div style="background-color: var(--secondary-background-color); border: 1px solid rgba(128,128,128,0.2); border-radius: 10px; padding: 14px 10px 10px 10px; text-align: center;">
+    <div style="background-color: var(--secondary-background-color); border: 1px solid rgba(128,128,128,0.16); border-radius: 18px; padding: 18px 14px 14px 14px; text-align: center; box-shadow: 0 1px 3px rgba(0,0,0,0.02);">
         <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 612 696" width="100%" height="auto" style="max-height: 440px; display: block; margin: auto;">
             <g id="india-map-group">
                 {paths_str}
@@ -846,8 +937,10 @@ with st.sidebar:
     st.markdown(f"#### {t['sidebar_help_title']}")
     st.info(t["sidebar_help_desc"])
 
+badge_text = "फसल स्वास्थ्य निदान • 14 मुख्य फसलें" if is_hindi else "Autonomous Foliar Diagnostics • 14 Crop Species"
 st.markdown(f"""
 <div class="cs-hero">
+    <div class="cs-hero-badge"><span class="cs-badge-dot"></span> {badge_text}</div>
     <div class="cs-title">{t['title']}</div>
     <div class="cs-tagline">{t['tagline']}</div>
 </div>
@@ -1000,18 +1093,28 @@ if page == t["nav_overview"]:
     cta_col1, cta_col2 = st.columns([1.5, 1.5], gap="medium")
     with cta_col1:
         st.markdown(f"""
-        <div class="cs-card" style="text-align: center;">
-            <h4 style="margin-top:0; color:#2e7d32;">{t['p0_cta1_title']}</h4>
-            <p style="font-size:0.92rem; opacity:0.9;">{t['p0_cta1_desc']}</p>
-            <p style="font-size:0.85rem; color:#2e7d32; font-weight:600;">{t['p0_cta1_link']}</p>
+        <div class="cs-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+                <div style="font-size: 1.5rem; margin-bottom: 8px;">🩺</div>
+                <h4 style="margin-top:0; color:#059669; font-weight:700;">{t['p0_cta1_title']}</h4>
+                <p style="font-size:0.92rem; opacity:0.85; line-height:1.5;">{t['p0_cta1_desc']}</p>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(128,128,128,0.12); font-size:0.85rem; color:#059669; font-weight:700;">
+                {t['p0_cta1_link']}
+            </div>
         </div>
         """, unsafe_allow_html=True)
     with cta_col2:
         st.markdown(f"""
-        <div class="cs-card" style="text-align: center;">
-            <h4 style="margin-top:0; color:#1565c0;">{t['p0_cta2_title']}</h4>
-            <p style="font-size:0.92rem; opacity:0.9;">{t['p0_cta2_desc']}</p>
-            <p style="font-size:0.85rem; color:#1565c0; font-weight:600;">{t['p0_cta2_link']}</p>
+        <div class="cs-card" style="display: flex; flex-direction: column; justify-content: space-between; height: 100%;">
+            <div>
+                <div style="font-size: 1.5rem; margin-bottom: 8px;">🔬</div>
+                <h4 style="margin-top:0; color:#0284c7; font-weight:700;">{t['p0_cta2_title']}</h4>
+                <p style="font-size:0.92rem; opacity:0.85; line-height:1.5;">{t['p0_cta2_desc']}</p>
+            </div>
+            <div style="margin-top: 14px; padding-top: 12px; border-top: 1px solid rgba(128,128,128,0.12); font-size:0.85rem; color:#0284c7; font-weight:700;">
+                {t['p0_cta2_link']}
+            </div>
         </div>
         """, unsafe_allow_html=True)
 
