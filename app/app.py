@@ -42,27 +42,6 @@ st.markdown("""
         font-family: 'Plus Jakarta Sans', -apple-system, sans-serif;
     }
     
-    [data-testid="stAppViewContainer"],
-    .stApp,
-    .main {
-        background-color: var(--background-color) !important;
-        background-image: 
-            radial-gradient(circle at 92% 10%, rgba(16, 185, 129, 0.08) 0%, transparent 45%),
-            radial-gradient(circle at 8% 85%, rgba(5, 150, 105, 0.06) 0%, transparent 45%),
-            url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160' viewBox='0 0 160 160'%3E%3Cpath d='M25,75 C25,35 55,18 85,18 C85,55 65,75 25,75 Z' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.8' stroke-opacity='0.18'/%3E%3Cpath d='M25,75 C45,52 85,18' fill='none' stroke='%23059669' stroke-width='1.4' stroke-opacity='0.18'/%3E%3Cpath d='M42,60 C55,62 64,56' fill='none' stroke='%23059669' stroke-width='1.1' stroke-opacity='0.16'/%3E%3Cpath d='M54,46 C64,49 72,40' fill='none' stroke='%23059669' stroke-width='1.1' stroke-opacity='0.16'/%3E%3Cpath d='M125,145 L125,85' stroke='%23059669' stroke-width='1.8' stroke-opacity='0.18' stroke-linecap='round'/%3E%3Cpath d='M125,135 Q112,127 112,118 Q125,122 125,135' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18'/%3E%3Cpath d='M125,135 Q138,127 138,118 Q125,122 125,135' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18'/%3E%3Cpath d='M125,118 Q112,110 112,101 Q125,105 125,118' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18'/%3E%3Cpath d='M125,118 Q138,110 138,101 Q125,105 125,118' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18'/%3E%3Cpath d='M125,101 Q114,94 114,86 Q125,89 125,101' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18'/%3E%3Cpath d='M125,101 Q136,94 136,86 Q125,89 125,101' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18'/%3E%3Cpath d='M125,85 L125,70' stroke='%23059669' stroke-width='1.3' stroke-opacity='0.18' stroke-linecap='round'/%3E%3Cpath d='M35,135 Q35,120 40,115' fill='none' stroke='%23059669' stroke-width='1.6' stroke-opacity='0.18' stroke-linecap='round'/%3E%3Cpath d='M40,115 Q30,105 24,112 Q32,120 40,115' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.2' stroke-opacity='0.18'/%3E%3Cpath d='M40,115 Q50,105 56,112 Q48,120 40,115' fill='%2310b981' fill-opacity='0.06' stroke='%23059669' stroke-width='1.2' stroke-opacity='0.18'/%3E%3Ccircle cx='135' cy='32' r='2' fill='%23059669' fill-opacity='0.18'/%3E%3Ccircle cx='85' cy='135' r='1.5' fill='%23059669' fill-opacity='0.16'/%3E%3Ccircle cx='15' cy='25' r='1.5' fill='%23059669' fill-opacity='0.16'/%3E%3C/svg%3E") !important;
-        background-repeat: repeat !important;
-        background-attachment: fixed !important;
-        background-size: auto, auto, 160px 160px !important;
-    }
-    
-    header[data-testid="stHeader"] {
-        background: transparent !important;
-    }
-    
-    .main {
-        background: transparent !important;
-    }
-    
     .main .block-container {
         padding-top: 1.5rem;
         padding-bottom: 3rem;
