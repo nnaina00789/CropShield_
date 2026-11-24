@@ -1,12 +1,22 @@
 import io
+import json
+import os
+import sys
 from datetime import datetime
 from pathlib import Path
-import json
 import matplotlib.cm as cm
 import numpy as np
 from PIL import Image
 import streamlit as st
 import torch
+
+APP_DIR = Path(__file__).resolve().parent
+ROOT_DIR = APP_DIR.parent
+SRC_DIR = ROOT_DIR / "src"
+
+for p in [str(SRC_DIR), str(ROOT_DIR), str(APP_DIR)]:
+    if p not in sys.path:
+        sys.path.insert(0, p)
 
 from dataset import CLASSES, eval_tf
 from model import build_resnet18
@@ -916,11 +926,16 @@ CROP_CATALOG = {
 def load_assets():
     detector = load_leaf_detector(device=DEVICE)
     model = build_resnet18().to(DEVICE)
-    ckpt = "checkpoints/resnet18_field.pt" if Path("checkpoints/resnet18_field.pt").exists() else "checkpoints/resnet18.pt"
+    ckpt = (ROOT_DIR / "checkpoints/resnet18_field.pt") if (ROOT_DIR / "checkpoints/resnet18_field.pt").exists() else (ROOT_DIR / "checkpoints/resnet18.pt")
+    if not ckpt.exists():
+        ckpt = Path("checkpoints/resnet18_field.pt") if Path("checkpoints/resnet18_field.pt").exists() else Path("checkpoints/resnet18.pt")
     model.load_state_dict(torch.load(ckpt, map_location=DEVICE))
-    remedies_en = json.load(open("app/remedies.json", encoding="utf-8"))
-    remedies_hi = json.load(open("app/remedies_hi.json", encoding="utf-8"))
-    kvk_data = json.load(open("app/kvk_directory.json", encoding="utf-8"))
+    remedies_en_file = (APP_DIR / "remedies.json") if (APP_DIR / "remedies.json").exists() else Path("app/remedies.json")
+    remedies_hi_file = (APP_DIR / "remedies_hi.json") if (APP_DIR / "remedies_hi.json").exists() else Path("app/remedies_hi.json")
+    kvk_file = (APP_DIR / "kvk_directory.json") if (APP_DIR / "kvk_directory.json").exists() else Path("app/kvk_directory.json")
+    remedies_en = json.load(open(remedies_en_file, encoding="utf-8"))
+    remedies_hi = json.load(open(remedies_hi_file, encoding="utf-8"))
+    kvk_data = json.load(open(kvk_file, encoding="utf-8"))
     return detector, GradCAM(model, model.layer4), {"English": remedies_en, "हिन्दी (Hindi)": remedies_hi}, kvk_data
 
 def overlay(img, heat):
@@ -947,14 +962,15 @@ def get_standardized_image(image_or_path, size=(240, 240)):
         return None
 
 def get_healthy_reference_image(crop_name: str):
+    demo_dir = (ROOT_DIR / "demo_images") if (ROOT_DIR / "demo_images").exists() else Path("demo_images")
     prefix = "Cherry_(including_sour)___healthy" if crop_name == "Cherry" else f"{crop_name}___healthy"
     for ext in [".jpg", ".png", ".jpeg"]:
-        p = Path("demo_images") / f"{prefix}{ext}"
+        p = demo_dir / f"{prefix}{ext}"
         if p.exists():
             return Image.open(p).convert("RGB")
     c_sub = crop_name.split("_")[0]
     for ext in [".jpg", ".png"]:
-        p = Path("demo_images") / f"{c_sub}___healthy{ext}"
+        p = demo_dir / f"{c_sub}___healthy{ext}"
         if p.exists():
             return Image.open(p).convert("RGB")
     return None
@@ -1019,7 +1035,7 @@ EXTENDED_PATHOLOGY = {
 
 @st.cache_data
 def get_india_svg(selected_region: str, is_hindi: bool = False) -> str:
-    map_file = Path("app/india_map.json")
+    map_file = (APP_DIR / "india_map.json") if (APP_DIR / "india_map.json").exists() else Path("app/india_map.json")
     if not map_file.exists():
         return "<p>Map data unavailable.</p>"
     with open(map_file, encoding="utf-8") as f:
@@ -1665,9 +1681,10 @@ elif page == t["nav_crops"]:
                 cond_prev = ext_item["prevention_hi"][0] if is_hindi else ext_item["prevention"][0]
             else:
                 info = remedies[c]
-                sample_img_path = Path("demo_images") / f"{c}.jpg"
+                demo_dir = (ROOT_DIR / "demo_images") if (ROOT_DIR / "demo_images").exists() else Path("demo_images")
+                sample_img_path = demo_dir / f"{c}.jpg"
                 if not sample_img_path.exists() and "Cherry" in c:
-                    sample_img_path = Path("demo_images") / "Cherry_(including_sour)___healthy.jpg"
+                    sample_img_path = demo_dir / "Cherry_(including_sour)___healthy.jpg"
                 cond_name = info['name']
                 cond_type = info['type'].title()
                 if is_hindi:

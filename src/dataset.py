@@ -4,8 +4,9 @@ from PIL import Image
 from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms
 
-ROOT = Path("data/raw/plantvillage dataset/color")
-SPLITS = Path("splits")
+ROOT_DIR = Path(__file__).resolve().parent.parent
+ROOT = ROOT_DIR / "data/raw/plantvillage dataset/color"
+SPLITS = ROOT_DIR / "splits" if (ROOT_DIR / "splits").exists() else Path("splits")
 MEAN, STD = [0.485, 0.456, 0.406], [0.229, 0.224, 0.225]
 
 train_tf = transforms.Compose([

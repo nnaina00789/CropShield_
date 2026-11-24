@@ -17,10 +17,11 @@ from sklearn.metrics import (
 )
 from dataset import eval_tf, ROOT as PV_ROOT
 
-CKPT_PATH = Path("checkpoints/leaf_detector.pt")
-PLANTDOC_ROOT = Path("data/raw/PlantDoc-Dataset")
-NON_LEAF_ROOT = Path("data/raw/non_leaf")
-OUT = Path("reports"); OUT.mkdir(exist_ok=True)
+ROOT_DIR = Path(__file__).resolve().parent.parent
+CKPT_PATH = ROOT_DIR / "checkpoints/leaf_detector.pt" if (ROOT_DIR / "checkpoints/leaf_detector.pt").exists() else Path("checkpoints/leaf_detector.pt")
+PLANTDOC_ROOT = ROOT_DIR / "data/raw/PlantDoc-Dataset"
+NON_LEAF_ROOT = ROOT_DIR / "data/raw/non_leaf"
+OUT = ROOT_DIR / "reports"; OUT.mkdir(exist_ok=True)
 
 
 class LeafDetector(nn.Module):
