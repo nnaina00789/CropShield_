@@ -1482,66 +1482,80 @@ elif page == t["nav_crops"]:
         alert_level = "LOW"
 
         if sim_crop in ["Potato", "Tomato"]:
-            if 12 <= sim_temp <= 22 and sim_humidity >= 80 and sim_wet_hours >= 8:
-                risk_score = min(98, 40 + int(sim_wet_hours * 3.5) + int((sim_humidity - 70) * 1.5))
+            if sim_temp <= 22:
+                t_eff = max(0.1, 1.0 - 0.07 * abs(sim_temp - 18.0))
+                w_eff = min(1.0, max(0.05, sim_wet_hours / 16.0))
+                h_eff = min(1.0, max(0.05, (sim_humidity - 40.0) / 55.0))
+                risk_score = min(98, max(8, int(10 + 88 * t_eff * (0.55 * w_eff + 0.45 * h_eff))))
                 pathogen_name = "पछेती झुलसा (Phytophthora infestans)" if is_hindi else "Late Blight (Phytophthora infestans)"
-                alert_level = "CRITICAL"
                 action_advice = "🚨 अत्यधिक गंभीर जोखिम! ठंड और ओस से भरी पत्तियों पर पछेती झुलसा बहुत तेजी से पनपता है। पूरे खेत में फैलने से पहले तुरंत कॉपर युक्त या सिस्टेमिक फफूंदनाशक का छिड़काव करें।" if is_hindi else "🚨 High outbreak risk! Late blight sporangia germinate rapidly in cool, dew-saturated foliage. Apply protective copper or systemic fungicide before full canopy infection."
-            elif 22 <= sim_temp <= 30 and sim_humidity >= 70 and sim_wet_hours >= 4:
-                risk_score = min(88, 30 + int(sim_wet_hours * 3.0) + int((sim_humidity - 60) * 1.2))
+            elif 22 < sim_temp <= 31:
+                t_eff = max(0.15, 1.0 - 0.08 * abs(sim_temp - 26.0))
+                w_eff = min(1.0, max(0.05, sim_wet_hours / 18.0))
+                h_eff = min(1.0, max(0.05, (sim_humidity - 35.0) / 60.0))
+                risk_score = min(94, max(8, int(10 + 84 * t_eff * (0.5 * w_eff + 0.5 * h_eff))))
                 pathogen_name = "अगेती झुलसा (Alternaria solani)" if is_hindi else "Early Blight (Alternaria solani)"
-                alert_level = "MODERATE"
                 action_advice = "⚠️ अल्टरनेरिया फफूंद नम और गर्म मौसम में तेजी से फैलती है। पौधे की निचली संक्रमित पत्तियों को तोड़कर नष्ट करें और ऊपर से पानी देने से बचें।" if is_hindi else "⚠️ Alternaria conidia require alternating wet and warm periods. Remove lower infected leaves and avoid overhead irrigation."
-            elif sim_temp >= 32 and sim_humidity <= 50:
-                risk_score = 72
+            else:
+                t_eff = max(0.15, 1.0 - 0.07 * abs(sim_temp - 35.0))
+                dry_eff = min(1.0, max(0.1, (75.0 - sim_humidity) / 50.0))
+                risk_score = min(90, max(12, int(15 + 75 * t_eff * dry_eff * max(0.2, 1.0 - sim_wet_hours / 20.0))))
                 pathogen_name = "लाल मकड़ी / सफेद मक्खी (विषाणु वाहक)" if is_hindi else "Spider Mites / Whitefly TYLCV Vector"
-                alert_level = "MODERATE"
                 action_advice = "गर्म और शुष्क मौसम में मकड़ियों और सफेद मक्खियों का प्रकोप तेजी से बढ़ता है। पत्तियों की निचली सतह की नियमित निगरानी करें।" if is_hindi else "Hot, dry conditions accelerate mite reproduction and whitefly migration. Monitor underside of leaves."
 
         elif sim_crop in ["Apple", "Cherry"]:
-            if 14 <= sim_temp <= 24 and sim_humidity >= 75 and sim_wet_hours >= 6:
-                risk_score = min(92, 35 + int(sim_wet_hours * 3.5))
+            if sim_wet_hours >= 4 or sim_humidity >= 70:
+                t_eff = max(0.1, 1.0 - 0.08 * abs(sim_temp - 19.0))
+                w_eff = min(1.0, max(0.05, sim_wet_hours / 16.0))
+                h_eff = min(1.0, max(0.05, (sim_humidity - 45.0) / 50.0))
+                risk_score = min(95, max(10, int(12 + 83 * t_eff * (0.6 * w_eff + 0.4 * h_eff))))
                 pathogen_name = "सेब का स्कैब (Venturia inaequalis)" if is_hindi else "Apple Scab (Venturia inaequalis)"
-                alert_level = "CRITICAL"
                 action_advice = "🚨 पत्तियों पर लंबे समय तक गीलापन रहने से स्कैब के बीजाणु सक्रिय हो गए हैं। 48 घंटों के भीतर सुरक्षात्मक फफूंदनाशक का छिड़काव आवश्यक है।" if is_hindi else "🚨 Mills Period met: Ascospores discharge during prolonged leaf wetness. Fungicidal protection needed within 48 hours."
-            elif 18 <= sim_temp <= 28 and 50 <= sim_humidity <= 75 and sim_wet_hours < 4:
-                risk_score = 65
+            else:
+                t_eff = max(0.15, 1.0 - 0.07 * abs(sim_temp - 24.0))
+                h_eff = min(1.0, max(0.1, (sim_humidity - 30.0) / 50.0))
+                risk_score = min(85, max(10, int(15 + 70 * t_eff * h_eff * max(0.2, 1.0 - sim_wet_hours / 15.0))))
                 pathogen_name = "चूर्णिल आसिता (Powdery Mildew)" if is_hindi else "Powdery Mildew (Podosphaera leucotricha)"
-                alert_level = "MODERATE"
                 action_advice = "चूर्णिल आसिता के बीजाणु गर्म और नम हवा में तेजी से फैलते हैं। पेड़ों की भीतरी घनी शाखाओं की छंटाई करें ताकि हवा का संचार बना रहे।" if is_hindi else "Mildew conidia germinate in warm, humid air without free leaf moisture. Prune dense inner canopy for airflow."
 
         elif sim_crop == "Grape":
-            if 20 <= sim_temp <= 30 and sim_humidity >= 75 and sim_wet_hours >= 6:
-                risk_score = min(90, 40 + int(sim_wet_hours * 3.2))
-                pathogen_name = "काला सड़न रोग (Guignardia bidwellii)" if is_hindi else "Black Rot (Guignardia bidwellii)"
-                alert_level = "CRITICAL"
-                action_advice = "🚨 गर्म बारिश और पत्तियों पर नमी नई कोपलों और अंगूर के गुच्छों पर काले सड़न के संक्रमण को ट्रिगर करती है।" if is_hindi else "🚨 Warm rain and leaf wetness trigger pycnidiospore infection on young leaves and berry clusters."
-            else:
-                risk_score = 30
+            t_eff = max(0.1, 1.0 - 0.07 * abs(sim_temp - 25.0))
+            w_eff = min(1.0, max(0.05, sim_wet_hours / 16.0))
+            h_eff = min(1.0, max(0.05, (sim_humidity - 40.0) / 55.0))
+            risk_score = min(95, max(10, int(10 + 85 * t_eff * (0.55 * w_eff + 0.45 * h_eff))))
+            pathogen_name = "काला सड़न रोग (Guignardia bidwellii)" if is_hindi else "Black Rot (Guignardia bidwellii)"
+            action_advice = "🚨 गर्म बारिश और पत्तियों पर नमी नई कोपलों और अंगूर के गुच्छों पर काले सड़न के संक्रमण को ट्रिगर करती है।" if is_hindi else "🚨 Warm rain and leaf wetness trigger pycnidiospore infection on young leaves and berry clusters."
 
         elif sim_crop == "Corn_(maize)":
-            if 18 <= sim_temp <= 28 and sim_humidity >= 80 and sim_wet_hours >= 6:
-                risk_score = 78
-                pathogen_name = "उत्तरी पत्ता झुलसा (Exserohilum turcicum)" if is_hindi else "Northern Corn Leaf Blight (Exserohilum turcicum)"
-                alert_level = "MODERATE"
-                action_advice = "भारी ओस और मध्यम तापमान सिगार के आकार के भूरे धब्बों को बढ़ावा देते हैं। फसल चक्र अपनाएं और खेत की स्वच्छता रखें।" if is_hindi else "Heavy dews and moderate temperatures favor cigar-shaped necrotic lesions. Ensure crop rotation and residue management."
-            else:
-                risk_score = 25
+            t_eff = max(0.1, 1.0 - 0.08 * abs(sim_temp - 22.0))
+            w_eff = min(1.0, max(0.05, sim_wet_hours / 16.0))
+            h_eff = min(1.0, max(0.05, (sim_humidity - 45.0) / 50.0))
+            risk_score = min(92, max(10, int(10 + 82 * t_eff * (0.5 * w_eff + 0.5 * h_eff))))
+            pathogen_name = "उत्तरी पत्ता झुलसा (Exserohilum turcicum)" if is_hindi else "Northern Corn Leaf Blight (Exserohilum turcicum)"
+            action_advice = "भारी ओस और मध्यम तापमान सिगार के आकार के भूरे धब्बों को बढ़ावा देते हैं। फसल चक्र अपनाएं और खेत की स्वच्छता रखें।" if is_hindi else "Heavy dews and moderate temperatures favor cigar-shaped necrotic lesions. Ensure crop rotation and residue management."
 
         elif sim_crop == "Pepper,_bell":
-            if 24 <= sim_temp <= 32 and sim_humidity >= 80 and sim_wet_hours >= 5:
-                risk_score = 84
-                pathogen_name = "जीवाणु धब्बा रोग (Xanthomonas campestris)" if is_hindi else "Bacterial Spot (Xanthomonas campestris)"
-                alert_level = "CRITICAL"
-                action_advice = "तेज हवा, बारिश और गर्मी में जीवाणु रंध्रों (stomata) के जरिए प्रवेश करते हैं। पत्तियां गीली होने पर पौधों को न छुएं।" if is_hindi else "Bacterial pathogens enter via stomata during wind-driven rain and high heat. Avoid handling plants when foliage is wet."
-            else:
-                risk_score = 30
+            t_eff = max(0.1, 1.0 - 0.08 * abs(sim_temp - 28.0))
+            w_eff = min(1.0, max(0.05, sim_wet_hours / 14.0))
+            h_eff = min(1.0, max(0.05, (sim_humidity - 45.0) / 50.0))
+            risk_score = min(94, max(10, int(10 + 84 * t_eff * (0.55 * w_eff + 0.45 * h_eff))))
+            pathogen_name = "जीवाणु धब्बा रोग (Xanthomonas campestris)" if is_hindi else "Bacterial Spot (Xanthomonas campestris)"
+            action_advice = "तेज हवा, बारिश और गर्मी में जीवाणु रंध्रों (stomata) के जरिए प्रवेश करते हैं। पत्तियां गीली होने पर पौधों को न छुएं।" if is_hindi else "Bacterial pathogens enter via stomata during wind-driven rain and high heat. Avoid handling plants when foliage is wet."
+
         else:
-            if sim_humidity >= 80 and sim_wet_hours >= 6:
-                risk_score = 60
-                pathogen_name = "सामान्य फंगल संक्रमण जोखिम" if is_hindi else "General Foliar Fungal Complex"
-                alert_level = "MODERATE"
-                action_advice = "लगातार नमी से फफूंद पनपने का खतरा है। पत्तियों के किनारों पर नियमित नजर रखें।" if is_hindi else "High moisture creates potential for fungal germination. Monitor leaf margins."
+            t_eff = max(0.1, 1.0 - 0.07 * abs(sim_temp - 24.0))
+            w_eff = min(1.0, max(0.05, sim_wet_hours / 16.0))
+            h_eff = min(1.0, max(0.05, (sim_humidity - 40.0) / 55.0))
+            risk_score = min(90, max(10, int(10 + 80 * t_eff * (0.5 * w_eff + 0.5 * h_eff))))
+            pathogen_name = "सामान्य फंगल संक्रमण जोखिम" if is_hindi else "General Foliar Fungal Complex"
+            action_advice = "लगातार नमी से फफूंद पनपने का खतरा है। पत्तियों के किनारों पर नियमित नजर रखें।" if is_hindi else "High moisture creates potential for fungal germination. Monitor leaf margins."
+
+        if risk_score >= 75:
+            alert_level = "CRITICAL"
+        elif risk_score >= 45:
+            alert_level = "MODERATE"
+        else:
+            alert_level = "LOW"
 
         if alert_level == "CRITICAL":
             st.error(t["p2_risk_critical"].format(risk=risk_score))
