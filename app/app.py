@@ -356,35 +356,6 @@ st.markdown("""
         color: var(--text-color);
         opacity: 0.75;
     }
-    
-    .sidebar-stats-card {
-        background: rgba(128, 128, 128, 0.04);
-        border: 1px solid rgba(128, 128, 128, 0.1);
-        border-radius: 14px;
-        padding: 12px 14px;
-        margin-top: 14px;
-    }
-    
-    .sidebar-stat-row {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        font-size: 0.72rem;
-        color: var(--text-color);
-        opacity: 0.8;
-        padding: 4px 0;
-        border-bottom: 1px solid rgba(128, 128, 128, 0.07);
-    }
-    
-    .sidebar-stat-row:last-child {
-        border-bottom: none;
-    }
-    
-    .sidebar-stat-row strong {
-        font-family: 'JetBrains Mono', monospace;
-        font-weight: 600;
-        color: #059669;
-    }
 </style>
 """, unsafe_allow_html=True)
 
@@ -1137,27 +1108,6 @@ with st.sidebar:
         </div>
         <div class="sidebar-help-phone">1800-180-1551</div>
         <div class="sidebar-help-subtitle">{helpline_sub}</div>
-    </div>
-    """, unsafe_allow_html=True)
-    
-    stat_lbl1 = "अनुमान विलंबता" if is_hindi else "Inference Latency"
-    stat_lbl2 = "आर्किटेक्चर" if is_hindi else "Architecture"
-    stat_lbl3 = "गेटकीपर फिल्टर" if is_hindi else "Gatekeeper Filter"
-    stat_val3 = "सक्रिय (0.80)" if is_hindi else "Active (0.80)"
-    st.markdown(f"""
-    <div class="sidebar-stats-card">
-        <div class="sidebar-stat-row">
-            <span>{stat_lbl1}</span>
-            <strong>&lt; 45ms</strong>
-        </div>
-        <div class="sidebar-stat-row">
-            <span>{stat_lbl2}</span>
-            <strong>ResNet18 Dual</strong>
-        </div>
-        <div class="sidebar-stat-row">
-            <span>{stat_lbl3}</span>
-            <strong>{stat_val3}</strong>
-        </div>
     </div>
     """, unsafe_allow_html=True)
 
