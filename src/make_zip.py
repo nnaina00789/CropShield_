@@ -16,10 +16,7 @@ INCLUDE_DIRS = [
 INCLUDE_FILES = [
     "README.md",
     "requirements.txt",
-    ".gitignore",
-    "CropShield_Presentation.pptx",
-    "CropShield_Project.ipynb",
-    "CropShield_Viva_and_Project_Guide.pdf"
+    ".gitignore"
 ]
 
 EXCLUDE_PATTERNS = [
