@@ -9,7 +9,6 @@ INCLUDE_DIRS = [
     "src",
     "checkpoints",
     "demo_images",
-    "reports",
     "splits"
 ]
 
