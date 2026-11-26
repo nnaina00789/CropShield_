@@ -245,26 +245,6 @@ st.markdown("""
         line-height: 1.2;
     }
     
-    .sidebar-brand-status {
-        font-size: 0.72rem;
-        font-weight: 600;
-        color: var(--text-color);
-        opacity: 0.75;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-        margin-top: 2px;
-    }
-    
-    .sidebar-pulse-dot {
-        width: 6px;
-        height: 6px;
-        border-radius: 9999px;
-        background-color: #10b981;
-        box-shadow: 0 0 6px rgba(16, 185, 129, 0.8);
-        display: inline-block;
-    }
-    
     .sidebar-section-label {
         font-size: 0.72rem;
         font-weight: 700;
@@ -1077,13 +1057,11 @@ with st.sidebar:
     t = UI[lang]
     remedies = all_remedies[lang]
     
-    brand_sub = "v2.4 इंजन सक्रिय" if is_hindi else "v2.4 Engine Active"
-    st.markdown(f"""
+    st.markdown("""
     <div class="sidebar-brand-card">
         <div class="sidebar-brand-icon">🌱</div>
         <div class="sidebar-brand-text">
             <div class="sidebar-brand-name">CropShield</div>
-            <div class="sidebar-brand-status"><span class="sidebar-pulse-dot"></span> {brand_sub}</div>
         </div>
     </div>
     """, unsafe_allow_html=True)
